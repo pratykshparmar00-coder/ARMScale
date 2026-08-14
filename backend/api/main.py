@@ -5,6 +5,7 @@ import os
 import time
 
 from backend.inference.llama_cpp_engine import LlamaCppEngine
+from backend.platform.detector import get_platform
 from backend.utils.system import get_system_info
 from backend.config import config
 from backend.benchmark.engine import BenchmarkEngine
@@ -42,22 +43,34 @@ async def health_check():
         "status": "ok",
         "architecture": sys_info["architecture"],
         "cpu": sys_info["cpu"],
-        "cpu_cores": sys_info["cpu_cores_physical"],
+        "cpu_cores": sys_info["physical_cores"],
         "ram_gb": sys_info["ram_gb"],
         "arm64": sys_info["is_arm"],
+        "provider": sys_info["provider"],
         "inference_available": engine.is_loaded
     }
+
+@app.get("/api/platform")
+async def get_platform_endpoint():
+    return get_platform().to_dict()
 
 @app.get("/api/system")
 async def get_system():
     return get_system_info()
 
 @app.get("/api/benchmark/latest")
-async def get_latest_benchmark():
-    baseline = optimizer.get_reference_baseline()
+async def get_latest_benchmark(workload_type: str = "short_generation"):
+    baseline = optimizer.get_reference_baseline(workload_type=workload_type)
     if not baseline:
-        raise HTTPException(status_code=404, detail="No recorded baseline benchmark found")
+        raise HTTPException(status_code=404, detail=f"No recorded baseline benchmark found for workload '{workload_type}'")
     return baseline
+
+@app.get("/api/optimization/latest")
+async def get_latest_optimization_endpoint():
+    latest = optimizer.get_latest_optimization()
+    if not latest:
+        raise HTTPException(status_code=404, detail="No completed optimization experiments found")
+    return latest
 
 @app.get("/api/model")
 async def get_model():
@@ -89,8 +102,6 @@ async def generate_text(req: GenerateRequest):
 @app.post("/api/optimize")
 async def start_optimize(req: OptimizationRequest, background_tasks: BackgroundTasks):
     experiment_id = optimizer.start_optimization(req)
-    # Run synchronously for now to ensure it completes before user queries, or background it.
-    # The instructions say: "Do not block the API request indefinitely. Implement a simple experiment/job system."
     background_tasks.add_task(optimizer.run_optimization_sync, req, experiment_id)
     return {
         "experiment_id": experiment_id,
@@ -102,4 +113,3 @@ async def get_optimize_status(experiment_id: str):
     if experiment_id not in optimizer.jobs:
         raise HTTPException(status_code=404, detail="Experiment not found")
     return optimizer.jobs[experiment_id]
-

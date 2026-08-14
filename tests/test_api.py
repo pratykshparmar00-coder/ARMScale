@@ -12,6 +12,21 @@ def test_health_check():
     assert "architecture" in data
     assert "inference_available" in data
 
+def test_platform_endpoint():
+    response = client.get("/api/platform")
+    assert response.status_code == 200
+    data = response.json()
+    assert "provider" in data
+    assert "architecture" in data
+    assert "physical_cores" in data
+
+def test_system_endpoint():
+    response = client.get("/api/system")
+    assert response.status_code == 200
+    data = response.json()
+    assert "architecture" in data
+    assert "ram_gb" in data
+
 def test_api_model_unloaded():
     engine.is_loaded = False
     response = client.get("/api/model")

@@ -1,9 +1,9 @@
 import os
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from .engine import InferenceEngine
 from backend.config import config
-import platform
+from backend.platform.detector import get_platform
 
 try:
     from llama_cpp import Llama
@@ -16,8 +16,10 @@ class LlamaCppEngine(InferenceEngine):
         self.model = None
         self.is_loaded = False
         self.model_path = config.MODEL_PATH
+        self.active_threads = config.MODEL_THREADS
+        self.active_context_size = config.MODEL_CONTEXT_SIZE
         
-    def load_model(self) -> bool:
+    def load_model(self, threads: Optional[int] = None, context_size: Optional[int] = None) -> bool:
         if not HAS_LLAMA_CPP:
             print("Error: llama_cpp is not installed.")
             return False
@@ -26,12 +28,14 @@ class LlamaCppEngine(InferenceEngine):
             print(f"Error: Model not found at {self.model_path}")
             return False
             
+        self.active_threads = threads if threads is not None else config.MODEL_THREADS
+        self.active_context_size = context_size if context_size is not None else config.MODEL_CONTEXT_SIZE
+        
         try:
-            # We measure model load time purely for internal metrics if needed
             self.model = Llama(
                 model_path=self.model_path,
-                n_ctx=config.MODEL_CONTEXT_SIZE,
-                n_threads=config.MODEL_THREADS,
+                n_ctx=self.active_context_size,
+                n_threads=self.active_threads,
                 verbose=False
             )
             self.is_loaded = True
@@ -71,6 +75,7 @@ class LlamaCppEngine(InferenceEngine):
         tokens_generated = output['usage']['completion_tokens']
         
         tokens_per_second = tokens_generated / latency_s if latency_s > 0 else 0
+        platform_info = get_platform().to_dict()
         
         return {
             "response": text_response.strip(),
@@ -79,12 +84,12 @@ class LlamaCppEngine(InferenceEngine):
             "tokens_per_second": tokens_per_second,
             "model": os.path.basename(self.model_path),
             "runtime": "llama.cpp",
-            "architecture": platform.machine(),
-            "local": True
+            "architecture": platform_info["architecture"],
+            "platform": platform_info["provider"],
+            "local": platform_info["provider"] == "local"
         }
 
     def benchmark(self) -> Dict[str, Any]:
-        # Benchmark logic will be handled by the benchmark engine component
         pass
 
     def get_model_info(self) -> Dict[str, Any]:
@@ -95,5 +100,7 @@ class LlamaCppEngine(InferenceEngine):
             "quantization": "Q4_K_M",
             "model_size_mb": os.path.getsize(self.model_path) / (1024*1024) if os.path.exists(self.model_path) else 0,
             "runtime": "llama.cpp",
+            "active_threads": self.active_threads,
+            "active_context_size": self.active_context_size,
             "loaded_status": self.is_loaded
         }
