@@ -1,8 +1,22 @@
 {
+  "buildCommand": null,
+  "outputDirectory": "frontend",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://armscale.onrender.com/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://armscale.onrender.com/health"
+    }
+  ],
+  "headers": [
+    {
       "source": "/(.*)",
-      "destination": "/api/index.py"
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
     }
   ]
 }

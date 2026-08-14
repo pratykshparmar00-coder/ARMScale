@@ -211,9 +211,18 @@ async def get_optimize_status(experiment_id: str):
         raise HTTPException(status_code=404, detail="Experiment not found")
     return optimizer.jobs[experiment_id]
 
-# Frontend Static Serving
+# Frontend Static Serving (serves CSS/JS/HTML from frontend/ directory)
 if os.path.exists(frontend_dir):
-    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+    # Serve style.css and app.js at root-relative paths (matching Vercel static hosting)
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static_legacy")
+
+    @app.get("/style.css")
+    async def serve_css():
+        return FileResponse(os.path.join(frontend_dir, "style.css"), media_type="text/css")
+
+    @app.get("/app.js")
+    async def serve_js():
+        return FileResponse(os.path.join(frontend_dir, "app.js"), media_type="application/javascript")
 
     @app.get("/")
     async def serve_ui():
@@ -221,3 +230,4 @@ if os.path.exists(frontend_dir):
         if os.path.exists(index_path):
             return FileResponse(index_path)
         return {"status": "ARMScale API running. Frontend index.html not yet initialized."}
+
