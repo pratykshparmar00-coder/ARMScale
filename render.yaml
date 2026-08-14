@@ -2,7 +2,7 @@ services:
   - type: web
     name: armscale-backend
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --prefer-binary -r requirements.txt
     startCommand: python main.py
     envVars:
       - key: PYTHON_VERSION

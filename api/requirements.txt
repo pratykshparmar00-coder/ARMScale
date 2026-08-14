@@ -1,7 +1,8 @@
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 fastapi
 uvicorn
 psutil
 pydantic
-llama-cpp-python
 httpx
 pytest
+llama-cpp-python
