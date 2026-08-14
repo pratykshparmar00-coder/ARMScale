@@ -3,8 +3,9 @@ from backend.platform.detector import get_platform
 from .models import OptimizationConfig, OptimizationDimension
 from backend.config import config
 
-VALID_CONTEXT_SIZES = [1024, 2048, 4096]
-DEFAULT_OPTIMIZED_THREADS = 4 # Validated optimal baseline thread count
+VALID_THREADS_MATRIX = [2, 4, 6, 8]
+VALID_CONTEXT_MATRIX = [1024, 2048, 4096]
+DEFAULT_OPTIMIZED_THREADS = 4 # Validated baseline thread count
 
 class ConfigurationGenerator:
     def __init__(self):
@@ -32,9 +33,8 @@ class ConfigurationGenerator:
     def generate_context_candidates(self, override_contexts: Optional[List[int]] = None) -> List[int]:
         """Generates and validates safe context window sizes."""
         if override_contexts:
-            # Validate within safe operational range (512 to 32768)
             return sorted([c for c in override_contexts if 512 <= c <= 32768])
-        return sorted(VALID_CONTEXT_SIZES)
+        return sorted(VALID_CONTEXT_MATRIX)
 
     def generate_configurations(
         self, 
@@ -66,9 +66,9 @@ class ConfigurationGenerator:
                 ))
                 
         elif dimension == OptimizationDimension.COMBINED:
-            # Focused combined search space to keep testing fast and deterministic
-            threads_pool = override_threads or [2, 4, min(6, self.physical_cores)]
-            context_pool = override_contexts or [1024, 2048, 4096]
+            # 12-configuration joint matrix: Threads [2, 4, 6, 8] x Context [1024, 2048, 4096]
+            threads_pool = override_threads if override_threads is not None else VALID_THREADS_MATRIX
+            context_pool = override_contexts if override_contexts is not None else VALID_CONTEXT_MATRIX
             for t in sorted(list(set(threads_pool))):
                 for c in sorted(list(set(context_pool))):
                     configs.append(OptimizationConfig(

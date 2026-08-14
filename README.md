@@ -1,54 +1,73 @@
 # ARMScale
 **Autonomous Arm64 AI Inference Optimizer**
 
-## Problem
-AI inference is expensive and configuration-sensitive. The optimal combination of runtime parameters (threads, batch sizes, quantization formats, and context handling) varies dramatically across hardware architectures. Setting these manually is a trial-and-error process that often leaves cloud resources underutilized.
+ARMScale is an autonomous optimization and benchmarking platform designed to extract maximum price-performance efficiency from Arm64 cloud infrastructure (such as Google Axion C4A, AWS Graviton, and Ampere Altra) for AI inference workloads.
 
-## Solution
-ARMScale automatically benchmarks and optimizes AI inference on Arm64 cloud infrastructure. It profiles the model across various configurations, constructs a Pareto frontier of trade-offs (Latency vs Throughput vs Memory), and recommends the most cost-effective deployment strategy.
+---
 
-## Why Arm64
-Arm-based processors in the cloud (such as AWS Graviton, Google Axion, and Microsoft Cobalt) offer significant price-performance advantages. ARMScale is purpose-built to extract maximum efficiency from these environments.
+## Key Features
+- **Cloud-Agnostic Platform Abstraction**: Seamlessly operates across local workstations, Google Cloud Axion instances, and generic Arm64 bare metal.
+- **Joint Multi-Dimensional Optimization**: Evaluates joint trade-offs between CPU threads (`2, 4, 6, 8`) and context window sizes (`1024, 2048, 4096`).
+- **Workload Separation**: Distinct evaluation for `short_generation` interactive latency vs. `context_stress` long-context prefill workloads.
+- **Objective-Driven Recommendations**: Recommends optimal configurations based on user priorities (Speed, Throughput, or Balanced).
+- **Empirical Pareto Analysis**: Mathematically computes non-dominated frontier configurations.
+- **Live Minimal Web Dashboard**: Interactive visualization of the Latency vs. Throughput trade-off space with real measurement points.
+- **Zero-Fabrication Architecture**: Strict adherence to real monotonic timing and raw measurement preservation.
 
-## Architecture
-ARMScale uses an abstract inference router, meaning it isn't tied to a single framework.
-1. **API Gateway:** Handles inference requests securely.
-2. **Inference Engine:** Loads and serves models (currently utilizing `llama.cpp` for CPU inference).
-3. **Benchmark Engine:** Rigorously profiles performance using high-resolution monotonic timing.
-4. **Optimization Engine (Roadmap):** Automatically searches the configuration space.
+---
 
-## Supported Runtimes
-- `llama.cpp` (Current via `llama-cpp-python`)
-- (Roadmap: ONNX Runtime, ExecuTorch, LiteRT)
+## Quickstart
 
-## Supported Models
-The architecture supports GGUF format models.
-Baseline benchmarking uses: `Qwen2.5-0.5B-Instruct-GGUF` (Q4_K_M).
-
-## Optimization Dimensions
-- **Latency** (SPEED)
-- **Throughput** (THROUGHPUT)
-- **Memory Usage** (MEMORY)
-- **Balanced Profile**
-- **Estimated Cost** (COST)
-
-## Benchmark Methodology
-ARMScale executes deterministic prompt suites with warmup cycles and multiple measured passes, eliminating network jitter by tracking true model inference time from within the engine itself.
-
-## Deployment
-ARMScale is designed to be fully containerized for Arm64 cloud environments.
+### 1. Setup Environment
 ```bash
-# Setup
 python -m venv .venv
-# Activate venv
+# On Windows: .venv\Scripts\Activate.ps1
+# On Linux: source .venv/bin/activate
 pip install -r requirements.txt
+python tools/download_model.py
 ```
 
-## Arm64 Validation
-ARMScale includes environmental awareness. It will clearly distinguish x86_64 development environments from true Arm64 benchmark-eligible infrastructure to ensure measurement integrity.
+### 2. Run Optimization Experiments
+```bash
+# Run 12-configuration joint sweep on short generation
+python tools/optimize.py --dimension combined --workload short_generation --objective speed
 
-## Reproducibility
-All benchmarks generate timestamped JSON and CSV artifacts detailing precise hardware configurations, runtime settings, and measured percentiles.
+# Run 12-configuration joint sweep on context stress
+python tools/optimize.py --dimension combined --workload context_stress --objective speed
+```
 
-## Current Results
-**Arm64 benchmark results: PENDING**
+### 3. Launch the Web UI & API
+```bash
+uvicorn backend.api.main:app --host 127.0.0.1 --port 8000
+```
+Open `http://localhost:8000/` in your browser to explore the dashboard.
+
+---
+
+## Architecture
+
+```mermaid
+graph TD
+    API[FastAPI Gateway / Web UI] --> REC[Recommendation Engine]
+    API --> OPT[Optimization Engine]
+    OPT --> GEN[Configuration Generator]
+    OPT --> BENCH[Benchmark Engine]
+    BENCH --> ENG[Inference Engine (llama.cpp)]
+    OPT --> SCORE[Scoring & Pareto Engine]
+    BENCH --> PLAT[Platform Adapter Layer]
+```
+
+---
+
+## Documentation
+- [Architecture](docs/ARCHITECTURE.md)
+- [Platform Abstraction](docs/PLATFORM_ARCHITECTURE.md)
+- [Multi-Dimensional Optimization](docs/MULTI_DIMENSIONAL_OPTIMIZATION.md)
+- [Context Optimization](docs/CONTEXT_OPTIMIZATION.md)
+- [Google Axion Target](docs/GOOGLE_AXION.md)
+- [Axion Deployment Guide](docs/DEPLOYMENT_AXION.md)
+
+---
+
+## License
+MIT License

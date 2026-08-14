@@ -54,7 +54,6 @@ class ScoringEngine:
             elif objective == Objective.BALANCED:
                 score = (l_score + t_score) / 2.0
             elif objective == Objective.MEMORY:
-                # Memory measurement is currently unavailable; fall back to balanced
                 score = (l_score + t_score) / 2.0
                 r['scoring_note'] = "Memory optimization is deferred until native/process-level measurement is implemented; balanced scoring applied."
             else:
@@ -74,6 +73,7 @@ class ScoringEngine:
           (A.latency <= B.latency AND A.throughput >= B.throughput)
           AND (A.latency < B.latency OR A.throughput > B.throughput)
           
+        Also annotates each item in `results` with `pareto_optimal: True/False`.
         Returns all non-dominated configurations.
         """
         pareto = []
@@ -96,6 +96,7 @@ class ScoringEngine:
                     is_dominated = True
                     break
                     
+            r1["pareto_optimal"] = not is_dominated
             if not is_dominated:
                 pareto.append(r1)
                 

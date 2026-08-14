@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, status, BackgroundTasks
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import os
 import time
 
@@ -11,13 +13,19 @@ from backend.config import config
 from backend.benchmark.engine import BenchmarkEngine
 from backend.optimizer.engine import OptimizationEngine
 from backend.optimizer.models import OptimizationRequest, Objective
+from backend.optimizer.recommender import RecommendationEngine
+from backend.optimizer.registry import ExperimentRegistry
 
 app = FastAPI(title="ARMScale API", description="Autonomous Arm64 AI Inference Optimizer")
 
-# Global engine instances
+# Global engine and registry instances
 engine = LlamaCppEngine()
 benchmark_engine = BenchmarkEngine(engine)
 optimizer = OptimizationEngine(engine, benchmark_engine)
+registry = ExperimentRegistry()
+recommender = RecommendationEngine(registry)
+
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend")
 
 @app.on_event("startup")
 async def startup_event():
@@ -66,11 +74,35 @@ async def get_latest_benchmark(workload_type: str = "short_generation"):
     return baseline
 
 @app.get("/api/optimization/latest")
-async def get_latest_optimization_endpoint():
-    latest = optimizer.get_latest_optimization()
+async def get_latest_optimization_endpoint(workload_type: Optional[str] = None):
+    latest = registry.get_latest_experiment(workload_type=workload_type)
     if not latest:
         raise HTTPException(status_code=404, detail="No completed optimization experiments found")
     return latest
+
+@app.get("/api/optimization/experiments")
+async def list_experiments_endpoint(workload_type: Optional[str] = None):
+    return registry.list_experiments(workload_type=workload_type)
+
+@app.get("/api/optimization/pareto")
+async def get_pareto_endpoint(workload_type: str = "short_generation"):
+    latest = registry.get_latest_experiment(workload_type=workload_type)
+    if not latest or "pareto_configurations" not in latest:
+        raise HTTPException(status_code=404, detail=f"No Pareto configurations found for workload '{workload_type}'")
+    return {
+        "workload": workload_type,
+        "experiment_id": latest.get("experiment_id"),
+        "pareto_configurations": latest.get("pareto_configurations", [])
+    }
+
+class RecommendRequest(BaseModel):
+    workload: str = "short_generation"
+    objective: str = "speed"
+
+@app.post("/api/optimize/recommend")
+async def recommend_endpoint(req: RecommendRequest):
+    res = recommender.recommend(workload=req.workload, objective=req.objective)
+    return res
 
 @app.get("/api/model")
 async def get_model():
@@ -113,3 +145,14 @@ async def get_optimize_status(experiment_id: str):
     if experiment_id not in optimizer.jobs:
         raise HTTPException(status_code=404, detail="Experiment not found")
     return optimizer.jobs[experiment_id]
+
+# Frontend Static Serving
+if os.path.exists(frontend_dir):
+    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+
+    @app.get("/")
+    async def serve_ui():
+        index_path = os.path.join(frontend_dir, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"status": "ARMScale API running. Frontend index.html not yet initialized."}

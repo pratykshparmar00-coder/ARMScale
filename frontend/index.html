@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARMScale — Autonomous AI Inference Optimizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1>ARMScale</h1>
+                    <p class="tagline">Autonomous Arm64 AI Inference Optimizer</p>
+                </div>
+            </div>
+            <div class="env-banner">
+                <div class="badge badge-warning">DEVELOPMENT — x86_64</div>
+                <div class="badge badge-outline">NOT AN ARM64 BENCHMARK</div>
+            </div>
+        </header>
+
+        <!-- Platform Metadata Bar -->
+        <section class="platform-bar" id="platform-bar">
+            <div class="platform-item">
+                <span class="label">Provider:</span>
+                <span class="value" id="val-provider">LOCAL</span>
+            </div>
+            <div class="platform-item">
+                <span class="label">Architecture:</span>
+                <span class="value highlight" id="val-arch">x86_64 / amd64</span>
+            </div>
+            <div class="platform-item">
+                <span class="label">Host CPU:</span>
+                <span class="value" id="val-cpu">Detecting...</span>
+            </div>
+            <div class="platform-item">
+                <span class="label">Cores:</span>
+                <span class="value" id="val-cores">--</span>
+            </div>
+            <div class="platform-item">
+                <span class="label">RAM:</span>
+                <span class="value" id="val-ram">-- GB</span>
+            </div>
+            <div class="platform-item">
+                <span class="label">Runtime:</span>
+                <span class="value" id="val-runtime">llama.cpp</span>
+            </div>
+        </section>
+
+        <!-- Main Grid Controls & Recommendations -->
+        <main class="dashboard-grid">
+            <!-- Left: Workload & Optimizer Controls -->
+            <div class="card control-card">
+                <h2 class="card-title">Optimization Controls</h2>
+                
+                <div class="control-group">
+                    <label for="workload-select">Workload Suite</label>
+                    <select id="workload-select" class="select-input">
+                        <option value="short_generation" selected>Short Generation (5 Standard Prompts)</option>
+                        <option value="context_stress">Context Stress (~650 Input Tokens)</option>
+                    </select>
+                    <small class="help-text" id="workload-desc">5 deterministic prompts testing short-response interactive latency.</small>
+                </div>
+
+                <div class="control-group">
+                    <label for="objective-select">Optimization Objective</label>
+                    <select id="objective-select" class="select-input">
+                        <option value="speed" selected>Speed (Minimize Mean Latency)</option>
+                        <option value="throughput">Throughput (Maximize Tokens/sec)</option>
+                        <option value="balanced">Balanced (50% Latency / 50% Throughput)</option>
+                    </select>
+                </div>
+
+                <button id="btn-recommend" class="btn btn-primary">Find Best Configuration</button>
+            </div>
+
+            <!-- Middle: Active Recommendation Card -->
+            <div class="card recommendation-card">
+                <div class="card-header-flex">
+                    <h2 class="card-title">Optimal Recommendation</h2>
+                    <span class="badge badge-accent" id="rec-obj-badge">SPEED OPTIMIZED</span>
+                </div>
+
+                <div class="recommendation-hero">
+                    <div class="hero-config" id="rec-config-hero">Threads=4, Context=2048</div>
+                    <p class="hero-reason" id="rec-reason">Lowest measured mean latency across all configurations.</p>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-label">Mean Latency</span>
+                        <span class="stat-val" id="rec-lat">-- ms</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Throughput</span>
+                        <span class="stat-val" id="rec-tps">-- tok/s</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Latency Improvement</span>
+                        <span class="stat-val text-green" id="rec-lat-imp">+--%</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Throughput Improvement</span>
+                        <span class="stat-val text-green" id="rec-tps-imp">+--%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Pareto Frontier Card -->
+            <div class="card pareto-card">
+                <h2 class="card-title">Empirical Pareto Frontier</h2>
+                <p class="card-subtitle">Non-dominated configurations representing optimal trade-offs:</p>
+                <div class="pareto-list" id="pareto-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Visual Scatter Plot Section -->
+        <section class="card visual-section">
+            <div class="card-header-flex">
+                <div>
+                    <h2 class="card-title">Pareto Trade-off Space</h2>
+                    <p class="card-subtitle">Latency vs. Throughput (Pareto-optimal points highlighted)</p>
+                </div>
+                <div class="legend">
+                    <span class="legend-item"><span class="dot dot-pareto"></span> Pareto Frontier</span>
+                    <span class="legend-item"><span class="dot dot-normal"></span> Dominated Config</span>
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="paretoChart" width="900" height="340"></canvas>
+            </div>
+        </section>
+
+        <!-- Detailed Configuration Matrix Table -->
+        <section class="card table-section">
+            <div class="card-header-flex">
+                <h2 class="card-title">Comprehensive Measured Configuration Matrix</h2>
+                <span class="badge" id="table-count-badge">12 Configurations</span>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Configuration</th>
+                            <th>Mean Latency</th>
+                            <th>Median</th>
+                            <th>P95</th>
+                            <th>Min / Max</th>
+                            <th>Std Dev</th>
+                            <th>Throughput</th>
+                            <th>Pareto Status</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matrix-tbody">
+                        <tr><td colspan="9" class="text-center">Loading experiment data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>ARMScale Autonomous Arm64 AI Optimizer • Google Create AI Challenge 2026 Cloud Track</p>
+            <p class="footer-sub">All benchmark metrics come from authentic monotonic timers without simulation.</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
