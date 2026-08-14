@@ -40,8 +40,39 @@ config_gen = ConfigurationGenerator()
 
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend")
 
+async def keep_alive_worker():
+    """Periodically pings the Render server every 10 minutes to prevent free-tier 15-minute inactivity shutdown."""
+    import asyncio
+    import httpx
+    
+    # Render automatically injects RENDER_EXTERNAL_URL or RENDER_EXTERNAL_HOSTNAME
+    target_url = os.environ.get("KEEP_ALIVE_URL") or os.environ.get("RENDER_EXTERNAL_URL")
+    if not target_url and os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+        target_url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}"
+        
+    if not target_url:
+        return
+        
+    ping_endpoint = f"{target_url.rstrip('/')}/health"
+    print(f"Keep-Alive: Initialized self-ping worker targeting {ping_endpoint}")
+    
+    # Wait 5 minutes before first ping
+    await asyncio.sleep(300)
+    
+    while True:
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                res = await client.get(ping_endpoint)
+                print(f"Keep-Alive: Self-ping sent to {ping_endpoint} (status {res.status_code})")
+        except Exception as e:
+            print(f"Keep-Alive: Ping attempt to {ping_endpoint} notice: {e}")
+            
+        # Ping every 10 minutes (600 seconds) - well within Render's 15-minute threshold
+        await asyncio.sleep(600)
+
 @app.on_event("startup")
 async def startup_event():
+    import asyncio
     print("Starting ARMScale API...")
     if os.path.exists(config.MODEL_PATH):
         print(f"Loading model from {config.MODEL_PATH}...")
@@ -52,6 +83,9 @@ async def startup_event():
             print("Warning: Model failed to load.")
     else:
         print(f"Warning: Model file not found at {config.MODEL_PATH}. API starting without resident model.")
+        
+    # Start Keep-Alive task in background
+    asyncio.create_task(keep_alive_worker())
 
 @app.on_event("shutdown")
 async def shutdown_event():
