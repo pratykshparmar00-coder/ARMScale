@@ -69,7 +69,20 @@ def main():
     print(f"Dimension:        {req.dimension.value.upper()}")
     print(f"Workload:         {req.workload_type.upper()}")
     print(f"Platform:         {platform_info['provider'].upper()} ({platform_info['architecture']})")
-    print(f"Host CPU:         {platform_info['cpu']} ({platform_info['physical_cores']} physical / {platform_info['logical_cores']} logical cores)\n")
+    print(f"Host CPU:         {platform_info['cpu']} ({platform_info['physical_cores']} physical / {platform_info['logical_cores']} logical cores)")
+    
+    if req.dimension == OptimizationDimension.GLOBAL:
+        print("\nGLOBAL OPTIMIZATION")
+        print("-------------------")
+        print("Quantizations: 3 (Q4_K_M, Q5_K_M, Q8_0)")
+        print("Threads: 4 (2, 4, 6, 8)")
+        print("Contexts: 3 (1024, 2048, 4096)")
+        print("Total configurations: 36")
+        print("Warmups/config: 2")
+        print("Measured runs/config: 5")
+        print("Total inference runs: 252\n")
+    else:
+        print()
     
     engine.load_model()
     
