@@ -1,28 +1,47 @@
 # ARMScale Optimization Engine
 
-The ARMScale Optimization Engine is responsible for executing hardware-aware hyperparameter searches across AI inference engines.
+The ARMScale Optimization Engine executes hardware-aware hyperparameter searches across AI inference engines.
 
 ## Optimization Dimensions
-In this phase, we support **Thread Optimization**. We dynamically scan the available CPU logic (physical vs logical cores) and generate thread candidates (e.g., 1, 2, 4, 6, 8, 12). 
+In this phase, we support **CPU Thread Optimization**. We dynamically scan host CPU capabilities (physical vs logical cores) and generate thread candidates (e.g., 1, 2, 4, 6, 8, 12).
 *(Note: Quantization, Context, and Batching optimization are deferred for later phases to maintain strict scientific controls).*
 
-## Benchmark Methodology
-- The optimizer uses the exact same `BenchmarkEngine` built in Phase C.
-- Warmups: 2
-- Measured runs: 5
-- Model and Prompts remain fixed.
-- After every configuration change, the engine is properly recycled to apply the new hardware bindings.
+## Benchmark Workload & Statistical Methodology
+To ensure scientific comparability:
+- **Model**: `Qwen/Qwen2.5-0.5B-Instruct-GGUF` (`qwen2.5-0.5b-instruct-q4_k_m.gguf`)
+- **Quantization**: `Q4_K_M`
+- **Prompt Suite**: Standardized 5-prompt suite (identical prompts and execution order)
+- **Token Generation Settings**: `max_tokens = 128`, `temperature = 0.0`
+- **Token Accounting**: Strictly counts generated completion tokens: `tokens_per_second = completion_tokens / generation_time_s`
+- **Warmups**: 2 runs
+- **Measured Runs**: 5 runs
+- **Statistical Aggregation**: All statistics (mean, median, p95 with linear interpolation, min, max, standard deviation) are calculated directly from the raw measurements of the 5 runs.
+- **Engine Reinitialization**: Model is cleanly reloaded for each candidate configuration to bind CPU threads accurately without counting initialization time in generation latency.
 
 ## Objective Functions
-1. **SPEED**: Emphasizes the lowest mean latency (`mean_latency_ms`).
-2. **THROUGHPUT**: Emphasizes the highest generation speed (`tokens_per_second`).
-3. **MEMORY**: Minimizes RAM usage (`memory_mb`).
-4. **BALANCED**: A normalized scoring function equally weighting all three metrics:
-   `score = (normalized_latency + normalized_tps + normalized_memory) / 3.0`
+1. **SPEED**: Emphasizes minimal generation latency.
+   `score = (normalized_latency_score * 0.9) + (normalized_throughput_score * 0.1)`
+2. **THROUGHPUT**: Emphasizes maximum token throughput.
+   `score = (normalized_throughput_score * 0.9) + (normalized_latency_score * 0.1)`
+3. **BALANCED**: Equal 50/50 balance between latency and throughput:
+   `score = (normalized_latency_score + normalized_throughput_score) / 2.0`
+4. **MEMORY**: *Memory optimization is deferred until native/process-level measurement is implemented.* When selected, falls back to BALANCED with a documented note.
 
-## Pareto Analysis
-A configuration is added to the Pareto Frontier if it is **non-dominated**. A configuration A dominates B if A is no worse than B in all metrics (latency, throughput) and strictly better in at least one metric. We return all non-dominated configurations so the user can visualize the true trade-offs rather than forcing a single "winner".
+Where `normalized_latency_score` inverts the normalized latency (lower is better, yielding 1.0 at minimum latency), and `normalized_throughput_score` yields 1.0 at maximum throughput.
 
-## Limitations
-- Thread optimizations on some backends may have non-linear scaling due to memory bandwidth limits. 
-- Memory profiling in Python is somewhat loose. Native memory profiling will be needed for exact memory optimization on cloud servers.
+## Mathematical Pareto Analysis
+A configuration A dominates configuration B if and only if:
+- `A.mean_latency_ms <= B.mean_latency_ms` AND `A.mean_tokens_per_second >= B.mean_tokens_per_second`
+- AND (`A.mean_latency_ms < B.mean_latency_ms` OR `A.mean_tokens_per_second > B.mean_tokens_per_second`)
+
+A configuration is Pareto-optimal (non-dominated) if no other tested configuration dominates it. All non-dominated configurations are returned.
+
+## Baseline Comparison Methodology
+Improvements vs baseline are calculated with identical mathematical definitions:
+- **Latency Improvement (%)**: `((baseline_latency - candidate_latency) / baseline_latency) * 100`
+- **Throughput Improvement (%)**: `((candidate_throughput - baseline_throughput) / baseline_throughput) * 100`
+- **Memory Improvement**: Marked as `null` / `unavailable` until native memory profiling is integrated.
+
+## Hardware Awareness & Scope
+- All benchmarks in this development phase are performed on **x86_64 development hardware**.
+- x86_64 measurements must **NEVER** be reported as Arm64 cloud results.

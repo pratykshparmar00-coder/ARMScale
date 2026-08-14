@@ -2,9 +2,9 @@ import os
 import time
 import uuid
 import json
-import csv
+import glob
 import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from .models import OptimizationRequest, OptimizationResult, OptimizationConfig, Objective
 from .config_generator import ConfigurationGenerator
@@ -20,11 +20,26 @@ class OptimizationEngine:
         self.config_generator = ConfigurationGenerator()
         self.scoring_engine = ScoringEngine()
         
-        self.results_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "benchmarks", "results", "optimization")
+        self.root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.results_dir = os.path.join(self.root_dir, "benchmarks", "results", "optimization")
         if not os.path.exists(self.results_dir):
             os.makedirs(self.results_dir)
             
         self.jobs = {}
+
+    def get_reference_baseline(self) -> Optional[Dict[str, Any]]:
+        """Finds the canonical baseline benchmark recorded (filtering out mock test runs)."""
+        baseline_dir = os.path.join(self.root_dir, "benchmarks", "results")
+        json_files = sorted(glob.glob(os.path.join(baseline_dir, "benchmark_*.json")))
+        for fpath in json_files:
+            try:
+                with open(fpath, 'r') as f:
+                    data = json.load(f)
+                    if data.get("model") != "mock/mock" and data.get("runtime") != "mock":
+                        return data
+            except Exception as e:
+                print(f"Warning: Could not read baseline candidate {fpath}: {e}")
+        return None
 
     def start_optimization(self, request: OptimizationRequest) -> str:
         experiment_id = str(uuid.uuid4())[:8]
@@ -41,73 +56,64 @@ class OptimizationEngine:
         start_time = time.time()
         self.jobs[experiment_id]["status"] = "running"
         
-        # 1. Establish Baseline
-        # We assume the default config is baseline. 
-        # But we must run it directly to ensure comparable measurements in this exact moment.
-        # However, user said: "Do not alter or overwrite the existing baseline. Create a new optimization experiment system that references the baseline."
-        # We will run a baseline measurement for this experiment.
-        print("Running optimization experiment baseline...")
+        # 1. Retrieve Canonical Reference Baseline (Phase C)
+        ref_baseline = self.get_reference_baseline()
         original_threads = config.MODEL_THREADS
-        baseline_result = self.benchmark_engine.run_baseline(threads=original_threads)
         
-        # 2. Generate Configurations
+        if not ref_baseline:
+            print("No existing baseline found. Running baseline benchmark now...")
+            ref_baseline = self.benchmark_engine.run_baseline(threads=original_threads, save=True)
+        else:
+            print(f"Referencing recorded baseline (Mean Latency: {ref_baseline['results']['mean_latency_ms']:.2f}ms, Mean Throughput: {ref_baseline['results']['mean_tokens_per_second']:.2f} tok/s)")
+            
+        # 2. Generate Candidate Configurations
         configs = self.config_generator.generate_configurations(request.threads_to_test)
         self.jobs[experiment_id]["total"] = len(configs)
         
         results = []
         
-        # 3. Benchmark Candidates
+        # 3. Benchmark Each Candidate Configuration
         for idx, cfg in enumerate(configs):
             self.jobs[experiment_id]["completed"] = idx
             self.jobs[experiment_id]["current_configuration"] = cfg.dict()
             
-            print(f"Testing configuration {idx+1}/{len(configs)}: {cfg.threads} threads")
+            print(f"\n[{idx+1}/{len(configs)}] Testing thread configuration: {cfg.threads} threads")
             
-            # Reconfigure engine
-            # We must unload and reload the model to apply thread changes in llama.cpp safely
+            # Safely unload and reload model with new thread count
             self.inference_engine.unload_model()
-            
-            # Temporarily override config
-            original_config_threads = config.MODEL_THREADS
             config.MODEL_THREADS = cfg.threads
             
             success = self.inference_engine.load_model()
             if not success:
                 print(f"Failed to load model for {cfg.threads} threads, skipping.")
-                config.MODEL_THREADS = original_config_threads
                 continue
                 
-            # Run benchmark
-            # Wait! The requirement says "Do not mix model initialization time into steady-state generation latency."
-            # The benchmark_engine only times generation, so we're good.
-            bench_res = self.benchmark_engine.run_baseline(threads=cfg.threads)
-            
-            # Attach the configuration to the result
+            # Run benchmark (saves individual benchmark artifact)
+            bench_res = self.benchmark_engine.run_baseline(threads=cfg.threads, save=True)
             bench_res['configuration']['threads'] = cfg.threads
             results.append(bench_res)
             
-            # Restore config
-            config.MODEL_THREADS = original_config_threads
-            
-        # 4. Analyze Results
+        # 4. Score and Analyze Results
         best_cfg = self.scoring_engine.score_results(results, request.objective)
         pareto_cfgs = self.scoring_engine.get_pareto_frontier(results)
         
-        # 5. Improvement Calculation vs Baseline
-        baseline_lat = baseline_result['results']['mean_latency_ms']
-        baseline_tps = baseline_result['results']['mean_tokens_per_second']
+        # 5. Calculate Improvements vs Reference Baseline
+        baseline_lat = ref_baseline['results']['mean_latency_ms']
+        baseline_tps = ref_baseline['results']['mean_tokens_per_second']
         
         best_lat = best_cfg['results']['mean_latency_ms']
         best_tps = best_cfg['results']['mean_tokens_per_second']
         
-        lat_imp = (baseline_lat - best_lat) / baseline_lat * 100 if baseline_lat > 0 else 0.0
-        tps_imp = (best_tps - baseline_tps) / baseline_tps * 100 if baseline_tps > 0 else 0.0
+        # Latency improvement: lower is better -> ((baseline - optimized) / baseline) * 100
+        lat_imp = ((baseline_lat - best_lat) / baseline_lat) * 100.0 if baseline_lat > 0 else 0.0
+        # Throughput improvement: higher is better -> ((optimized - baseline) / baseline) * 100
+        tps_imp = ((best_tps - baseline_tps) / baseline_tps) * 100.0 if baseline_tps > 0 else 0.0
         
         end_time = time.time()
         
         res = OptimizationResult(
             experiment_id=experiment_id,
-            baseline=baseline_result,
+            baseline=ref_baseline,
             configurations_tested=len(results),
             results=results,
             best_configuration=best_cfg,
@@ -115,7 +121,7 @@ class OptimizationEngine:
             improvement_vs_baseline={
                 "latency_pct": lat_imp,
                 "throughput_pct": tps_imp,
-                "memory_pct": 0.0 # Placeholder
+                "memory_pct": None # Memory measurement deferred until native profiling
             },
             execution_time_s=end_time - start_time
         )
@@ -140,3 +146,4 @@ class OptimizationEngine:
         
         with open(path, 'w') as f:
             json.dump(res.dict(), f, indent=2)
+        print(f"\nOptimization experiment saved to {path}")

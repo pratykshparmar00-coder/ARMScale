@@ -1,30 +1,37 @@
 # ARMScale Experiments
 
-This guide explains how to run optimization experiments using the ARMScale CLI.
+This guide documents how to execute optimization experiments using the ARMScale CLI and API.
 
-## Running an Optimization Experiment
+## Running Optimization Experiments
 
-You can trigger an optimization sweep via the CLI tool:
+Use the CLI to run hardware-aware sweeps:
 
 ```bash
-# Optimize for latency
+# Optimize for speed (latency minimized)
 python tools/optimize.py --objective speed
 
-# Optimize for throughput
+# Optimize for throughput (tokens/sec maximized)
 python tools/optimize.py --objective throughput
 
-# Optimize for balanced performance
+# Optimize with a balanced objective (50% latency, 50% throughput)
 python tools/optimize.py --objective balanced
 ```
 
-You can optionally specify exactly which thread counts to test to constrain the search space:
+To test specific thread counts:
 ```bash
-python tools/optimize.py --objective speed --threads 1,2,4,6
+python tools/optimize.py --objective speed --threads 1,2,4,6,8,12
 ```
 
-## Results Artifacts
-
-Every experiment is assigned a unique `experiment_id` and saved to:
+## Result Artifacts
+Each experiment is assigned a unique `experiment_id` and saved in JSON format under:
 `benchmarks/results/optimization/optimization_<timestamp>_<experiment_id>.json`
 
-These JSON files contain the full baseline reference, configurations tested, Pareto frontier analysis, and the overall "winner" configuration based on your requested objective.
+Individual per-configuration benchmarks are saved under:
+`benchmarks/results/benchmark_<timestamp>.json` and `.csv`
+
+All artifacts preserve full statistical granularity:
+- `mean_latency_ms`, `median_latency_ms`, `p95_latency_ms`, `min_latency_ms`, `max_latency_ms`, `std_latency_ms`
+- `mean_tokens_per_second`, `median_tokens_per_second`, `p95_tokens_per_second`, `min_tokens_per_second`, `max_tokens_per_second`, `std_tokens_per_second`
+- `memory_mb`: `null` (with `memory_status: "unavailable"`)
+- `pareto_configurations`: Non-dominated configuration set
+- `improvement_vs_baseline`: Exact percentage deltas against canonical baseline

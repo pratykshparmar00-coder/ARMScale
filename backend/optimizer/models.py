@@ -32,5 +32,5 @@ class OptimizationResult(BaseModel):
     results: List[Dict[str, Any]]
     best_configuration: Dict[str, Any]
     pareto_configurations: List[Dict[str, Any]]
-    improvement_vs_baseline: Dict[str, float]
+    improvement_vs_baseline: Dict[str, Optional[float]]
     execution_time_s: float
