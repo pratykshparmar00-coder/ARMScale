@@ -48,6 +48,17 @@ async def health_check():
         "inference_available": engine.is_loaded
     }
 
+@app.get("/api/system")
+async def get_system():
+    return get_system_info()
+
+@app.get("/api/benchmark/latest")
+async def get_latest_benchmark():
+    baseline = optimizer.get_reference_baseline()
+    if not baseline:
+        raise HTTPException(status_code=404, detail="No recorded baseline benchmark found")
+    return baseline
+
 @app.get("/api/model")
 async def get_model():
     return engine.get_model_info()
