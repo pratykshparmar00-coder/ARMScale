@@ -80,12 +80,33 @@
                 </div>
 
                 <div class="control-group">
-                    <label for="quant-filter">Filter Quantization View</label>
+                    <label for="quant-filter">Filter Quantization</label>
                     <select id="quant-filter" class="select-input">
-                        <option value="ALL" selected>All Quantizations (36 Configurations)</option>
-                        <option value="Q4_K_M">Q4_K_M Only (468.6 MB)</option>
-                        <option value="Q5_K_M">Q5_K_M Only (498.0 MB)</option>
-                        <option value="Q8_0">Q8_0 Only (644.4 MB)</option>
+                        <option value="ALL" selected>All Quantizations</option>
+                        <option value="Q4_K_M">Q4_K_M (468.6 MB)</option>
+                        <option value="Q5_K_M">Q5_K_M (498.0 MB)</option>
+                        <option value="Q8_0">Q8_0 (644.4 MB)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="thread-filter">Filter Threads</label>
+                    <select id="thread-filter" class="select-input">
+                        <option value="ALL" selected>All Threads (2, 4, 6, 8)</option>
+                        <option value="2">2 Threads</option>
+                        <option value="4">4 Threads</option>
+                        <option value="6">6 Threads</option>
+                        <option value="8">8 Threads</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="context-filter">Filter Context</label>
+                    <select id="context-filter" class="select-input">
+                        <option value="ALL" selected>All Contexts (1024, 2048, 4096)</option>
+                        <option value="1024">1024 Context</option>
+                        <option value="2048">2048 Context</option>
+                        <option value="4096">4096 Context</option>
                     </select>
                 </div>
 

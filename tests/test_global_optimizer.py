@@ -15,6 +15,7 @@ from backend.optimizer.config_generator import ConfigurationGenerator
 from backend.optimizer.scoring import ScoringEngine
 from backend.optimizer.recommender import RecommendationEngine
 from backend.optimizer.registry import ExperimentRegistry
+from backend.optimizer.comparison import calculate_improvement, compare_configurations
 
 client = TestClient(app)
 
@@ -178,3 +179,19 @@ def test_recommender_payload_and_evidence():
     assert len(rec["evidence"]) >= 3
     assert "quality_score: null" in rec["evidence"][-1]
     assert rec["baseline_improvement"]["latency_pct"] > 0
+
+def test_historical_registry_discovery():
+    registry = ExperimentRegistry()
+    experiments = registry.list_experiments()
+    assert len(experiments) >= 2
+    exp_ids = [e["experiment_id"] for e in experiments]
+    assert len(exp_ids) == len(set(exp_ids)) # No duplicate entries
+
+def test_comparison_calculations():
+    base = {"results": {"mean_latency_ms": 2000.0, "mean_tokens_per_second": 30.0, "model_size_mb": 600.0}}
+    cand = {"results": {"mean_latency_ms": 1500.0, "mean_tokens_per_second": 45.0, "model_size_mb": 450.0}}
+    
+    comp = compare_configurations(base, cand)
+    assert comp["improvements"]["latency_pct"] == 25.0
+    assert comp["improvements"]["throughput_pct"] == 50.0
+    assert comp["improvements"]["size_reduction_pct"] == 25.0

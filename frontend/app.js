@@ -25,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('quant-filter').addEventListener('change', () => {
         filterAndRenderTable();
     });
+
+    document.getElementById('thread-filter').addEventListener('change', () => {
+        filterAndRenderTable();
+    });
+
+    document.getElementById('context-filter').addEventListener('change', () => {
+        filterAndRenderTable();
+    });
 });
 
 async function initPlatform() {
@@ -91,10 +99,19 @@ async function loadDashboardData() {
 }
 
 function filterAndRenderTable() {
-    const filter = document.getElementById('quant-filter').value;
+    const qFilter = document.getElementById('quant-filter').value;
+    const tFilter = document.getElementById('thread-filter').value;
+    const cFilter = document.getElementById('context-filter').value;
+
     let filtered = currentExperimentResults;
-    if (filter !== 'ALL') {
-        filtered = currentExperimentResults.filter(r => (r.configuration.quantization || 'Q4_K_M') === filter);
+    if (qFilter !== 'ALL') {
+        filtered = filtered.filter(r => (r.configuration.quantization || 'Q4_K_M') === qFilter);
+    }
+    if (tFilter !== 'ALL') {
+        filtered = filtered.filter(r => String(r.configuration.threads) === tFilter);
+    }
+    if (cFilter !== 'ALL') {
+        filtered = filtered.filter(r => String(r.configuration.context_size) === cFilter);
     }
 
     renderTable(filtered);
