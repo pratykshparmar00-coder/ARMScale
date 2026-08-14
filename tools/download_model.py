@@ -11,7 +11,7 @@ from backend.inference.models import AVAILABLE_VARIANTS, calculate_file_sha256, 
 def report_progress(block_num, block_size, total_size):
     downloaded = block_num * block_size
     if total_size > 0:
-        percent = downloaded * 100 / total_size
+        percent = min(100.0, downloaded * 100 / total_size)
         sys.stdout.write(f"\rDownloading... {percent:.1f}% ({downloaded / (1024*1024):.1f} MB / {total_size / (1024*1024):.1f} MB)")
         sys.stdout.flush()
 
@@ -24,6 +24,7 @@ def download_single_variant(quantization: str, force: bool = False) -> bool:
     variant = AVAILABLE_VARIANTS[variant_key]
     model_url = f"https://huggingface.co/{variant.repository}/resolve/main/{variant.filename}"
     target_path = os.path.join(MODEL_DIR, variant.filename)
+    temp_part_path = target_path + ".part"
     
     print(f"\n========================================")
     print(f"Model Variant: {variant.quantization}")
@@ -45,29 +46,39 @@ def download_single_variant(quantization: str, force: bool = False) -> bool:
         print(f"SHA256: {sha}")
         return True
 
-    print("Starting download from HuggingFace...")
+    if os.path.exists(temp_part_path):
+        os.remove(temp_part_path)
+
+    print("Starting download from HuggingFace to temporary .part file...")
     try:
-        urllib.request.urlretrieve(model_url, target_path, reporthook=report_progress)
-        print("\nDownload complete.")
+        urllib.request.urlretrieve(model_url, temp_part_path, reporthook=report_progress)
+        print("\nDownload finished. Verifying integrity...")
         
-        actual_size = os.path.getsize(target_path)
+        actual_size = os.path.getsize(temp_part_path)
         actual_size_mb = actual_size / (1024 * 1024)
-        print(f"Exact file size: {actual_size} bytes ({actual_size_mb:.2f} MB)")
+        print(f"Downloaded size: {actual_size} bytes ({actual_size_mb:.2f} MB)")
         
-        # Verify size sanity
+        # Verify size sanity against official catalog
         if abs(actual_size - variant.expected_bytes) > (variant.expected_bytes * 0.05):
-            print(f"Warning: Downloaded size ({actual_size}) differs from expected ({variant.expected_bytes}).")
+            os.remove(temp_part_path)
+            raise ValueError(f"Integrity check failed: Downloaded size ({actual_size} bytes) does not match expected ({variant.expected_bytes} bytes).")
             
         print("Calculating SHA256 checksum...")
-        sha = calculate_file_sha256(target_path)
+        sha = calculate_file_sha256(temp_part_path)
         print(f"SHA256: {sha}")
-        print(f"Variant {variant.quantization} verified and ready for use.")
+        
+        # Atomic promotion from .part to final
+        if os.path.exists(target_path):
+            os.remove(target_path)
+        os.rename(temp_part_path, target_path)
+        
+        print(f"Variant {variant.quantization} successfully verified and ready for use.")
         return True
     except Exception as e:
-        print(f"\nDownload failed: {e}")
-        if os.path.exists(target_path):
-            print("Cleaning up partial file...")
-            os.remove(target_path)
+        print(f"\nDownload / verification failed: {e}")
+        if os.path.exists(temp_part_path):
+            print("Cleaning up partial .part file...")
+            os.remove(temp_part_path)
         return False
 
 def main():

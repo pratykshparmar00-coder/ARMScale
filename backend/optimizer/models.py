@@ -7,6 +7,7 @@ class Objective(str, Enum):
     THROUGHPUT = "throughput"
     MEMORY = "memory"
     BALANCED = "balanced"
+    SIZE = "size"
 
 class OptimizationDimension(str, Enum):
     THREADS = "threads"

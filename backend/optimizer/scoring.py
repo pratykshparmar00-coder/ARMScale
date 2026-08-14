@@ -28,6 +28,8 @@ class ScoringEngine:
           score = (throughput_score * 0.9) + (latency_score * 0.1)
         - BALANCED: 50% normalized inverse latency + 50% normalized throughput
           score = (latency_score + throughput_score) / 2.0
+        - SIZE: 80% normalized inverse model size + 10% normalized inverse latency + 10% normalized throughput
+          score = (size_score * 0.8) + (latency_score * 0.1) + (throughput_score * 0.1)
         - MEMORY: If memory measurement is unavailable, falls back to BALANCED with a documented note.
         """
         if not results:
@@ -35,17 +37,21 @@ class ScoringEngine:
             
         latencies = [r['results']['mean_latency_ms'] for r in results]
         tps = [r['results']['mean_tokens_per_second'] for r in results]
+        sizes = [r.get('model_size_mb', r['results'].get('model_size_mb', 0.0)) for r in results]
         
         min_lat, max_lat = min(latencies), max(latencies)
         min_tps, max_tps = min(tps), max(tps)
+        min_size, max_size = min(sizes), max(sizes)
 
         for r in results:
             res = r['results']
             l = res['mean_latency_ms']
             t = res['mean_tokens_per_second']
+            s = r.get('model_size_mb', res.get('model_size_mb', 0.0))
             
             l_score = ScoringEngine._normalize(l, min_lat, max_lat, invert=True)
             t_score = ScoringEngine._normalize(t, min_tps, max_tps, invert=False)
+            s_score = ScoringEngine._normalize(s, min_size, max_size, invert=True)
             
             if objective == Objective.SPEED:
                 score = (l_score * 0.9) + (t_score * 0.1)
@@ -53,6 +59,8 @@ class ScoringEngine:
                 score = (t_score * 0.9) + (l_score * 0.1)
             elif objective == Objective.BALANCED:
                 score = (l_score + t_score) / 2.0
+            elif objective == Objective.SIZE:
+                score = (s_score * 0.8) + (l_score * 0.1) + (t_score * 0.1)
             elif objective == Objective.MEMORY:
                 score = (l_score + t_score) / 2.0
                 r['scoring_note'] = "Memory optimization is deferred until native/process-level measurement is implemented; balanced scoring applied."
