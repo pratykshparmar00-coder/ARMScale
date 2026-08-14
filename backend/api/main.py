@@ -17,7 +17,18 @@ from backend.optimizer.config_generator import ConfigurationGenerator
 from backend.optimizer.recommender import RecommendationEngine
 from backend.optimizer.registry import ExperimentRegistry
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="ARMScale API", description="Autonomous Arm64 AI Inference Optimizer")
+
+# Enable CORS for cross-origin deployments (e.g. Vercel frontend + Render backend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Global engine and registry instances
 engine = LlamaCppEngine()

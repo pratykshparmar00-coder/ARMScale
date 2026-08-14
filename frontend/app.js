@@ -1,4 +1,5 @@
 let currentExperimentResults = [];
+const API_BASE = window.API_BASE_URL || localStorage.getItem('API_BASE_URL') || '';
 
 document.addEventListener('DOMContentLoaded', () => {
     initPlatform();
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initPlatform() {
     try {
-        const res = await fetch('/api/platform');
+        const res = await fetch(`${API_BASE}/api/platform`);
         if (res.ok) {
             const data = await res.json();
             document.getElementById('val-provider').textContent = data.provider.toUpperCase();
@@ -59,7 +60,7 @@ async function loadDashboardData() {
 
     try {
         // 1. Fetch Recommendation
-        const recRes = await fetch('/api/optimize/recommend', {
+        const recRes = await fetch(`${API_BASE}/api/optimize/recommend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ workload, objective })
@@ -85,7 +86,7 @@ async function loadDashboardData() {
         }
 
         // 2. Fetch Latest Experiment for Table & Scatter Plot
-        const expRes = await fetch(`/api/optimization/latest?workload_type=${workload}`);
+        const expRes = await fetch(`${API_BASE}/api/optimization/latest?workload_type=${workload}`);
         if (expRes.ok) {
             const exp = await expRes.json();
             if (exp.results) {
