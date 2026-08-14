@@ -1,22 +1,31 @@
 {
-  "buildCommand": null,
-  "outputDirectory": "frontend",
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://armscale.onrender.com/api/:path*"
-    },
-    {
-      "source": "/health",
-      "destination": "https://armscale.onrender.com/health"
+      "src": "frontend/**",
+      "use": "@vercel/static"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
-      ]
+      "src": "/api/(.*)",
+      "dest": "https://armscale.onrender.com/api/$1"
+    },
+    {
+      "src": "/health",
+      "dest": "https://armscale.onrender.com/health"
+    },
+    {
+      "src": "/(style\\.css)",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/(app\\.js)",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/index.html"
     }
   ]
 }
