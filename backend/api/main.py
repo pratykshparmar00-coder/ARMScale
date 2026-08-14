@@ -12,7 +12,8 @@ from backend.utils.system import get_system_info
 from backend.config import config
 from backend.benchmark.engine import BenchmarkEngine
 from backend.optimizer.engine import OptimizationEngine
-from backend.optimizer.models import OptimizationRequest, Objective
+from backend.optimizer.models import OptimizationRequest, Objective, OptimizationDimension
+from backend.optimizer.config_generator import ConfigurationGenerator
 from backend.optimizer.recommender import RecommendationEngine
 from backend.optimizer.registry import ExperimentRegistry
 
@@ -24,6 +25,7 @@ benchmark_engine = BenchmarkEngine(engine)
 optimizer = OptimizationEngine(engine, benchmark_engine)
 registry = ExperimentRegistry()
 recommender = RecommendationEngine(registry)
+config_gen = ConfigurationGenerator()
 
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend")
 
@@ -66,6 +68,17 @@ async def get_platform_endpoint():
 async def get_system():
     return get_system_info()
 
+@app.get("/api/optimization/search-space")
+async def get_search_space():
+    meta = config_gen.get_search_space_metadata()
+    return {
+        "dimension": "global",
+        "quantizations": meta["quantizations"],
+        "threads": meta["threads"],
+        "contexts": meta["contexts"],
+        "total_configurations": meta["total_configurations"]
+    }
+
 @app.get("/api/benchmark/latest")
 async def get_latest_benchmark(workload_type: str = "short_generation"):
     baseline = optimizer.get_reference_baseline(workload_type=workload_type)
@@ -74,8 +87,8 @@ async def get_latest_benchmark(workload_type: str = "short_generation"):
     return baseline
 
 @app.get("/api/optimization/latest")
-async def get_latest_optimization_endpoint(workload_type: Optional[str] = None):
-    latest = registry.get_latest_experiment(workload_type=workload_type)
+async def get_latest_optimization_endpoint(workload_type: Optional[str] = None, dimension: Optional[str] = None):
+    latest = registry.get_latest_experiment(workload_type=workload_type, dimension=dimension)
     if not latest:
         raise HTTPException(status_code=404, detail="No completed optimization experiments found")
     return latest
@@ -85,12 +98,13 @@ async def list_experiments_endpoint(workload_type: Optional[str] = None):
     return registry.list_experiments(workload_type=workload_type)
 
 @app.get("/api/optimization/pareto")
-async def get_pareto_endpoint(workload_type: str = "short_generation"):
-    latest = registry.get_latest_experiment(workload_type=workload_type)
+async def get_pareto_endpoint(workload_type: str = "short_generation", dimension: Optional[str] = None):
+    latest = registry.get_latest_experiment(workload_type=workload_type, dimension=dimension)
     if not latest or "pareto_configurations" not in latest:
         raise HTTPException(status_code=404, detail=f"No Pareto configurations found for workload '{workload_type}'")
     return {
         "workload": workload_type,
+        "dimension": latest.get("dimension", "unknown"),
         "experiment_id": latest.get("experiment_id"),
         "pareto_configurations": latest.get("pareto_configurations", [])
     }
@@ -98,10 +112,11 @@ async def get_pareto_endpoint(workload_type: str = "short_generation"):
 class RecommendRequest(BaseModel):
     workload: str = "short_generation"
     objective: str = "speed"
+    constraints: Optional[Dict[str, Any]] = None
 
 @app.post("/api/optimize/recommend")
 async def recommend_endpoint(req: RecommendRequest):
-    res = recommender.recommend(workload=req.workload, objective=req.objective)
+    res = recommender.recommend(workload=req.workload, objective=req.objective, constraints=req.constraints)
     return res
 
 @app.get("/api/model")

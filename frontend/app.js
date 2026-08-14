@@ -1,3 +1,5 @@
+let currentExperimentResults = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     initPlatform();
     loadDashboardData();
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('workload-select').addEventListener('change', (e) => {
         const desc = document.getElementById('workload-desc');
         if (e.target.value === 'short_generation') {
-            desc.textContent = '5 deterministic prompts testing short-response interactive latency (~15 input tokens).';
+            desc.textContent = '5 deterministic prompts testing interactive latency (~15 input tokens).';
         } else {
             desc.textContent = 'Document-grounded technical passage (~650 input tokens) testing prefill & KV-cache.';
         }
@@ -18,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('objective-select').addEventListener('change', () => {
         loadDashboardData();
+    });
+
+    document.getElementById('quant-filter').addEventListener('change', () => {
+        filterAndRenderTable();
     });
 });
 
@@ -75,13 +81,24 @@ async function loadDashboardData() {
         if (expRes.ok) {
             const exp = await expRes.json();
             if (exp.results) {
-                renderTable(exp.results);
-                renderScatterPlot(exp.results);
+                currentExperimentResults = exp.results;
+                filterAndRenderTable();
             }
         }
     } catch (e) {
         console.error('Error fetching dashboard data:', e);
     }
+}
+
+function filterAndRenderTable() {
+    const filter = document.getElementById('quant-filter').value;
+    let filtered = currentExperimentResults;
+    if (filter !== 'ALL') {
+        filtered = currentExperimentResults.filter(r => (r.configuration.quantization || 'Q4_K_M') === filter);
+    }
+
+    renderTable(filtered);
+    renderScatterPlot(filtered);
 }
 
 function renderParetoCards(paretoList) {
@@ -112,23 +129,26 @@ function renderTable(results) {
 
     document.getElementById('table-count-badge').textContent = `${results.length} Configurations`;
 
-    results.forEach(r => {
+    results.forEach((r, idx) => {
         const tr = document.createElement('tr');
         if (r.pareto_optimal) tr.className = 'pareto-row';
 
         const cfg = r.configuration;
         const res = r.results;
         const quant = cfg.quantization || 'Q4_K_M';
+        const cfgId = r.configuration_id || cfg.configuration_id || `cfg_${quant}_T${cfg.threads}_C${cfg.context_size}`;
         const sizeMb = (res.model_size_mb !== undefined ? `${res.model_size_mb.toFixed(1)} MB` : '--');
         const loadMs = (res.load_time_ms !== undefined ? `${res.load_time_ms.toFixed(0)} ms` : '--');
 
         tr.innerHTML = `
+            <td>#${idx + 1}</td>
+            <td><code>${cfgId}</code></td>
             <td><strong class="text-cyan">${quant}</strong></td>
-            <td><strong>T=${cfg.threads}, C=${cfg.context_size}</strong></td>
+            <td>${cfg.threads}</td>
+            <td>${cfg.context_size}</td>
             <td>${sizeMb}</td>
             <td>${loadMs}</td>
             <td>${res.mean_latency_ms.toFixed(2)} ms</td>
-            <td>${res.median_latency_ms.toFixed(2)} ms</td>
             <td>${res.p95_latency_ms.toFixed(2)} ms</td>
             <td><strong>${res.mean_tokens_per_second.toFixed(2)}</strong> tok/s</td>
             <td>${r.pareto_optimal ? '<span class="tag-pareto">PARETO OPTIMAL</span>' : '<span class="tag-dominated">Dominated</span>'}</td>
@@ -145,6 +165,8 @@ function renderScatterPlot(results) {
     const h = canvas.height;
 
     ctx.clearRect(0, 0, w, h);
+
+    if (!results || results.length === 0) return;
 
     const padLeft = 60, padRight = 40, padTop = 30, padBottom = 50;
 
@@ -197,19 +219,22 @@ function renderScatterPlot(results) {
     ctx.fillText('Throughput (tok/s) — Higher is Better ▲', 0, 0);
     ctx.restore();
 
-    // Plot Points
+    // Plot Points with radius proportional to model footprint (468MB to 644MB -> radius 4px to 9px)
     results.forEach(r => {
         const lat = r.results.mean_latency_ms;
         const tps = r.results.mean_tokens_per_second;
+        const sizeMb = r.results.model_size_mb || 468.0;
         const isPareto = r.pareto_optimal;
         const quant = r.configuration.quantization || 'Q4_K_M';
+
+        const radius = 4 + ((sizeMb - 468.0) / (645.0 - 468.0)) * 5; // 4px to 9px
 
         const x = padLeft + ((lat - minLat) / (maxLat - minLat)) * (w - padLeft - padRight);
         const y = h - padBottom - ((tps - minTps) / (maxTps - minTps)) * (h - padTop - padBottom);
 
         ctx.beginPath();
         if (isPareto) {
-            ctx.arc(x, y, 7, 0, 2 * Math.PI);
+            ctx.arc(x, y, radius + 2, 0, 2 * Math.PI);
             ctx.fillStyle = '#00e5ff';
             ctx.shadowColor = '#00e5ff';
             ctx.shadowBlur = 12;
@@ -221,8 +246,8 @@ function renderScatterPlot(results) {
             ctx.fillStyle = '#f0f4f8';
             ctx.fillText(`${quant} T=${r.configuration.threads}, C=${r.configuration.context_size}`, x + 10, y - 6);
         } else {
-            ctx.arc(x, y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
             ctx.fill();
         }
     });

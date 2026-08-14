@@ -156,8 +156,9 @@ def test_recommender_with_quantization_and_reasons():
     rec = rec_engine.recommend("short_generation", "speed")
     assert rec["status"] == "success"
     assert rec["recommended_configuration"]["quantization"] == "Q8_0"
-    assert "lower latency than baseline" in rec["reason"]
-    assert "model quality score unavailable" in rec["reason"]
+    assert "lowest measured mean latency" in rec["reason"].lower()
+    assert any("lower latency than baseline" in e for e in rec["evidence"])
+    assert any("quality_score: null" in e for e in rec["evidence"])
 
 def test_api_models_variants_endpoint():
     response = client.get("/api/models/variants")

@@ -17,16 +17,16 @@
                 <div class="logo-icon">⚡</div>
                 <div>
                     <h1>ARMScale</h1>
-                    <p class="tagline">Autonomous Arm64 AI Inference Optimizer</p>
+                    <p class="tagline">Autonomous Global Multi-Dimensional AI Inference Optimizer</p>
                 </div>
             </div>
             <div class="env-banner">
                 <div class="badge badge-warning">DEVELOPMENT — x86_64</div>
-                <div class="badge badge-outline">NOT AN ARM64 BENCHMARK</div>
+                <div class="badge badge-outline">NOT AN ARM64 / GOOGLE AXION BENCHMARK</div>
             </div>
         </header>
 
-        <!-- Platform Metadata Bar -->
+        <!-- Platform & Search Space Metadata Bar -->
         <section class="platform-bar" id="platform-bar">
             <div class="platform-item">
                 <span class="label">Provider:</span>
@@ -49,8 +49,8 @@
                 <span class="value" id="val-ram">-- GB</span>
             </div>
             <div class="platform-item">
-                <span class="label">Runtime:</span>
-                <span class="value" id="val-runtime">llama.cpp</span>
+                <span class="label">Global Search Space:</span>
+                <span class="value highlight" id="val-space">36 Configurations (3 Quant × 4 Threads × 3 Ctx)</span>
             </div>
         </section>
 
@@ -66,7 +66,7 @@
                         <option value="short_generation" selected>Short Generation (5 Standard Prompts)</option>
                         <option value="context_stress">Context Stress (~650 Input Tokens)</option>
                     </select>
-                    <small class="help-text" id="workload-desc">5 deterministic prompts testing short-response interactive latency.</small>
+                    <small class="help-text" id="workload-desc">5 deterministic prompts testing interactive latency (~15 input tokens).</small>
                 </div>
 
                 <div class="control-group">
@@ -79,19 +79,29 @@
                     </select>
                 </div>
 
-                <button id="btn-recommend" class="btn btn-primary">Find Best Configuration</button>
+                <div class="control-group">
+                    <label for="quant-filter">Filter Quantization View</label>
+                    <select id="quant-filter" class="select-input">
+                        <option value="ALL" selected>All Quantizations (36 Configurations)</option>
+                        <option value="Q4_K_M">Q4_K_M Only (468.6 MB)</option>
+                        <option value="Q5_K_M">Q5_K_M Only (498.0 MB)</option>
+                        <option value="Q8_0">Q8_0 Only (644.4 MB)</option>
+                    </select>
+                </div>
+
+                <button id="btn-recommend" class="btn btn-primary">Find Global Optimum</button>
             </div>
 
             <!-- Middle: Active Recommendation Card -->
             <div class="card recommendation-card">
                 <div class="card-header-flex">
-                    <h2 class="card-title">Optimal Recommendation</h2>
+                    <h2 class="card-title">Autonomous Deployment Decision</h2>
                     <span class="badge badge-accent" id="rec-obj-badge">SPEED OPTIMIZED</span>
                 </div>
 
                 <div class="recommendation-hero">
-                    <div class="hero-config" id="rec-config-hero">Threads=4, Context=2048</div>
-                    <p class="hero-reason" id="rec-reason">Lowest measured mean latency across all configurations.</p>
+                    <div class="hero-config" id="rec-config-hero">Q8_0 • Threads=6, Context=4096</div>
+                    <p class="hero-reason" id="rec-reason">Lowest measured mean latency across all 36 candidate configurations.</p>
                 </div>
 
                 <div class="stats-row">
@@ -116,8 +126,8 @@
 
             <!-- Right: Pareto Frontier Card -->
             <div class="card pareto-card">
-                <h2 class="card-title">Empirical Pareto Frontier</h2>
-                <p class="card-subtitle">Non-dominated configurations representing optimal trade-offs:</p>
+                <h2 class="card-title">3D Pareto Frontier</h2>
+                <p class="card-subtitle">Non-dominated trade-offs across (Latency ↓, Throughput ↑, Size ↓):</p>
                 <div class="pareto-list" id="pareto-list">
                     <!-- Populated dynamically -->
                 </div>
@@ -128,8 +138,8 @@
         <section class="card visual-section">
             <div class="card-header-flex">
                 <div>
-                    <h2 class="card-title">Pareto Trade-off Space</h2>
-                    <p class="card-subtitle">Latency vs. Throughput (Pareto-optimal points highlighted)</p>
+                    <h2 class="card-title">Global Trade-off Space (Latency vs. Throughput)</h2>
+                    <p class="card-subtitle">Point radius reflects model footprint (468MB to 644MB). Cyan glow marks Pareto-optimal points.</p>
                 </div>
                 <div class="legend">
                     <span class="legend-item"><span class="dot dot-pareto"></span> Pareto Frontier</span>
@@ -142,23 +152,25 @@
             </div>
         </section>
 
-        <!-- Detailed Configuration Matrix Table -->
+        <!-- Detailed 36-Configuration Matrix Table -->
         <section class="card table-section">
             <div class="card-header-flex">
-                <h2 class="card-title">Comprehensive Measured Configuration Matrix</h2>
-                <span class="badge" id="table-count-badge">12 Configurations</span>
+                <h2 class="card-title">Complete 36-Configuration Global Search Matrix</h2>
+                <span class="badge" id="table-count-badge">36 Configurations</span>
             </div>
             
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th>Rank</th>
+                            <th>Configuration ID</th>
                             <th>Variant</th>
-                            <th>Configuration</th>
+                            <th>Threads</th>
+                            <th>Context</th>
                             <th>Model Size</th>
                             <th>Load Time</th>
                             <th>Mean Latency</th>
-                            <th>Median</th>
                             <th>P95</th>
                             <th>Throughput</th>
                             <th>Pareto Status</th>
@@ -166,7 +178,7 @@
                         </tr>
                     </thead>
                     <tbody id="matrix-tbody">
-                        <tr><td colspan="10" class="text-center">Loading experiment data...</td></tr>
+                        <tr><td colspan="12" class="text-center">Loading experiment data...</td></tr>
                     </tbody>
                 </table>
             </div>

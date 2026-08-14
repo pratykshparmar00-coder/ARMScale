@@ -7,11 +7,11 @@ ARMScale is an autonomous optimization and benchmarking platform designed to ext
 
 ## Key Features
 - **Cloud-Agnostic Platform Abstraction**: Seamlessly operates across local workstations, Google Cloud Axion instances, and generic Arm64 bare metal.
-- **Joint Multi-Dimensional Optimization**: Evaluates joint trade-offs between CPU threads (`2, 4, 6, 8`) and context window sizes (`1024, 2048, 4096`).
+- **Autonomous Global Multi-Dimensional Optimization**: Evaluates the full 36-configuration Cartesian product across Quantizations (`Q4_K_M`, `Q5_K_M`, `Q8_0`) $\times$ CPU Threads (`2, 4, 6, 8`) $\times$ Context Windows (`1024, 2048, 4096`).
 - **Workload Separation**: Distinct evaluation for `short_generation` interactive latency vs. `context_stress` long-context prefill workloads.
-- **Objective-Driven Recommendations**: Recommends optimal configurations based on user priorities (Speed, Throughput, or Balanced).
-- **Empirical Pareto Analysis**: Mathematically computes non-dominated frontier configurations.
-- **Live Minimal Web Dashboard**: Interactive visualization of the Latency vs. Throughput trade-off space with real measurement points.
+- **Objective-Driven Recommendations**: Recommends optimal configurations based on user priorities (`Speed`, `Throughput`, `Size`, `Balanced`).
+- **Empirical 3D Pareto Analysis**: Mathematically computes non-dominated frontier configurations across Latency $\downarrow$, Throughput $\uparrow$, and Model Size $\downarrow$.
+- **Live Minimal Web Dashboard**: Interactive visualization of the Latency vs. Throughput trade-off space with real measurement points and model footprint scaling.
 - **Zero-Fabrication Architecture**: Strict adherence to real monotonic timing and raw measurement preservation.
 
 ---
@@ -24,16 +24,16 @@ python -m venv .venv
 # On Windows: .venv\Scripts\Activate.ps1
 # On Linux: source .venv/bin/activate
 pip install -r requirements.txt
-python tools/download_model.py
+python tools/download_model.py --variant all
 ```
 
-### 2. Run Optimization Experiments
+### 2. Run Global Optimization Sweeps (36 Configurations each)
 ```bash
-# Run 12-configuration joint sweep on short generation
-python tools/optimize.py --dimension combined --workload short_generation --objective speed
+# Run 36-configuration global sweep on short generation
+python tools/optimize.py --dimension global --workload short_generation --objective speed
 
-# Run 12-configuration joint sweep on context stress
-python tools/optimize.py --dimension combined --workload context_stress --objective speed
+# Run 36-configuration global sweep on context stress
+python tools/optimize.py --dimension global --workload context_stress --objective speed
 ```
 
 ### 3. Launch the Web UI & API
@@ -49,21 +49,23 @@ Open `http://localhost:8000/` in your browser to explore the dashboard.
 ```mermaid
 graph TD
     API[FastAPI Gateway / Web UI] --> REC[Recommendation Engine]
+    API --> REG[Experiment Registry]
     API --> OPT[Optimization Engine]
     OPT --> GEN[Configuration Generator]
     OPT --> BENCH[Benchmark Engine]
     BENCH --> ENG[Inference Engine (llama.cpp)]
-    OPT --> SCORE[Scoring & Pareto Engine]
+    OPT --> SCORE[Scoring & 3D Pareto Engine]
     BENCH --> PLAT[Platform Adapter Layer]
 ```
 
 ---
 
 ## Documentation
+- [Global Optimization](docs/GLOBAL_OPTIMIZATION.md)
+- [Quantization Optimization](docs/QUANTIZATION_OPTIMIZATION.md)
+- [Multi-Dimensional Optimization](docs/MULTI_DIMENSIONAL_OPTIMIZATION.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Platform Abstraction](docs/PLATFORM_ARCHITECTURE.md)
-- [Multi-Dimensional Optimization](docs/MULTI_DIMENSIONAL_OPTIMIZATION.md)
-- [Context Optimization](docs/CONTEXT_OPTIMIZATION.md)
 - [Google Axion Target](docs/GOOGLE_AXION.md)
 - [Axion Deployment Guide](docs/DEPLOYMENT_AXION.md)
 
