@@ -157,11 +157,18 @@ function renderTable(results) {
         const cfgId = r.configuration_id || cfg.configuration_id || `cfg_${quant}_T${cfg.threads}_C${cfg.context_size}`;
         const sizeMb = (res.model_size_mb !== undefined ? `${res.model_size_mb.toFixed(1)} MB` : '--');
         const loadMs = (res.load_time_ms !== undefined ? `${res.load_time_ms.toFixed(0)} ms` : '--');
+        const scoreVal = r.score !== undefined ? r.score : 0;
+        const scorePct = Math.min(scoreVal * 100, 100);
+
+        // Determine quantization color
+        let quantColor = '#00d4ff';
+        if (quant === 'Q5_K_M') quantColor = '#7c5cfc';
+        else if (quant === 'Q8_0') quantColor = '#22d3a7';
 
         tr.innerHTML = `
-            <td>#${idx + 1}</td>
-            <td><code>${cfgId}</code></td>
-            <td><strong class="text-cyan">${quant}</strong></td>
+            <td>${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '#' + (idx + 1)}</td>
+            <td><code style="font-size: 11px; opacity: 0.8;">${cfgId}</code></td>
+            <td><strong style="color: ${quantColor};">${quant}</strong></td>
             <td>${cfg.threads}</td>
             <td>${cfg.context_size}</td>
             <td>${sizeMb}</td>
@@ -169,8 +176,15 @@ function renderTable(results) {
             <td>${res.mean_latency_ms.toFixed(2)} ms</td>
             <td>${res.p95_latency_ms.toFixed(2)} ms</td>
             <td><strong>${res.mean_tokens_per_second.toFixed(2)}</strong> tok/s</td>
-            <td>${r.pareto_optimal ? '<span class="tag-pareto">PARETO OPTIMAL</span>' : '<span class="tag-dominated">Dominated</span>'}</td>
-            <td>${(r.score !== undefined ? r.score.toFixed(4) : '--')}</td>
+            <td>${r.pareto_optimal ? '<span class="tag-pareto">✦ PARETO</span>' : '<span class="tag-dominated">Dominated</span>'}</td>
+            <td>
+                <div class="score-cell">
+                    <span>${scoreVal.toFixed(4)}</span>
+                    <div class="score-bar-track">
+                        <div class="score-bar-fill" style="width: ${scorePct}%;"></div>
+                    </div>
+                </div>
+            </td>
         `;
         tbody.appendChild(tr);
     });
@@ -179,14 +193,24 @@ function renderTable(results) {
 function renderScatterPlot(results) {
     const canvas = document.getElementById('paretoChart');
     const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
+
+    // Handle high-DPI displays
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = 900 * dpr;
+    canvas.height = 360 * dpr;
+    canvas.style.width = '900px';
+    canvas.style.height = '360px';
+    ctx.scale(dpr, dpr);
+
+    const w = 900;
+    const h = 360;
 
     ctx.clearRect(0, 0, w, h);
 
     if (!results || results.length === 0) return;
 
-    const padLeft = 60, padRight = 40, padTop = 30, padBottom = 50;
+    const padLeft = 65, padRight = 45, padTop = 30, padBottom = 55;
 
     const latencies = results.map(r => r.results.mean_latency_ms);
     const tpsList = results.map(r => r.results.mean_tokens_per_second);
@@ -196,14 +220,13 @@ function renderScatterPlot(results) {
     const minTps = Math.min(...tpsList) * 0.85;
     const maxTps = Math.max(...tpsList) * 1.15;
 
-    // Draw Grid & Axes
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    // Draw Grid
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
     ctx.lineWidth = 1;
 
-    // Horizontal gridlines (TPS)
-    const gridYCount = 4;
+    // Horizontal gridlines
+    const gridYCount = 5;
     ctx.font = '11px JetBrains Mono';
-    ctx.fillStyle = '#64748b';
     for (let i = 0; i <= gridYCount; i++) {
         const val = minTps + (i / gridYCount) * (maxTps - minTps);
         const y = h - padBottom - (i / gridYCount) * (h - padTop - padBottom);
@@ -211,11 +234,12 @@ function renderScatterPlot(results) {
         ctx.moveTo(padLeft, y);
         ctx.lineTo(w - padRight, y);
         ctx.stroke();
-        ctx.fillText(val.toFixed(1), 15, y + 4);
+        ctx.fillStyle = '#556178';
+        ctx.fillText(val.toFixed(1), 10, y + 4);
     }
 
-    // Vertical gridlines (Latency)
-    const gridXCount = 5;
+    // Vertical gridlines
+    const gridXCount = 6;
     for (let i = 0; i <= gridXCount; i++) {
         const val = minLat + (i / gridXCount) * (maxLat - minLat);
         const x = padLeft + (i / gridXCount) * (w - padLeft - padRight);
@@ -223,50 +247,122 @@ function renderScatterPlot(results) {
         ctx.moveTo(x, padTop);
         ctx.lineTo(x, h - padBottom);
         ctx.stroke();
+        ctx.fillStyle = '#556178';
         ctx.fillText(`${val.toFixed(0)}ms`, x - 18, h - padBottom + 20);
     }
 
     // Axis Labels
     ctx.font = '12px Outfit';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('Latency (ms) — Lower is Better ◄', w / 2 - 80, h - 10);
+    ctx.fillStyle = '#8b99b0';
+    ctx.fillText('Latency (ms) — Lower is Better ◄', w / 2 - 100, h - 8);
 
     ctx.save();
-    ctx.translate(14, h / 2 + 60);
+    ctx.translate(14, h / 2 + 80);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText('Throughput (tok/s) — Higher is Better ▲', 0, 0);
     ctx.restore();
 
-    // Plot Points with radius proportional to model footprint (468MB to 644MB -> radius 4px to 9px)
-    results.forEach(r => {
+    // Sort: draw dominated first, then Pareto on top
+    const sortedResults = [...results].sort((a, b) => (a.pareto_optimal ? 1 : 0) - (b.pareto_optimal ? 1 : 0));
+
+    // Plot Points
+    sortedResults.forEach(r => {
         const lat = r.results.mean_latency_ms;
         const tps = r.results.mean_tokens_per_second;
         const sizeMb = r.results.model_size_mb || 468.0;
         const isPareto = r.pareto_optimal;
         const quant = r.configuration.quantization || 'Q4_K_M';
 
-        const radius = 4 + ((sizeMb - 468.0) / (645.0 - 468.0)) * 5; // 4px to 9px
+        const radius = 5 + ((sizeMb - 468.0) / (645.0 - 468.0)) * 6;
 
         const x = padLeft + ((lat - minLat) / (maxLat - minLat)) * (w - padLeft - padRight);
         const y = h - padBottom - ((tps - minTps) / (maxTps - minTps)) * (h - padTop - padBottom);
 
-        ctx.beginPath();
+        ctx.save();
+
         if (isPareto) {
+            // Outer glow
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 3);
+            gradient.addColorStop(0, 'rgba(0, 212, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+            ctx.beginPath();
+            ctx.arc(x, y, radius * 3, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Main point
+            ctx.beginPath();
             ctx.arc(x, y, radius + 2, 0, 2 * Math.PI);
-            ctx.fillStyle = '#00e5ff';
-            ctx.shadowColor = '#00e5ff';
-            ctx.shadowBlur = 12;
+            const pointGradient = ctx.createRadialGradient(x - 1, y - 1, 0, x, y, radius + 2);
+            pointGradient.addColorStop(0, '#4ff0ff');
+            pointGradient.addColorStop(1, '#00a8d4');
+            ctx.fillStyle = pointGradient;
+            ctx.shadowColor = '#00d4ff';
+            ctx.shadowBlur = 16;
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Label Pareto Point
+            // White border ring
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Label
             ctx.font = '10px JetBrains Mono';
-            ctx.fillStyle = '#f0f4f8';
-            ctx.fillText(`${quant} T=${r.configuration.threads}, C=${r.configuration.context_size}`, x + 10, y - 6);
+            ctx.fillStyle = '#e8edf5';
+            ctx.shadowColor = 'rgba(0,0,0,0.7)';
+            ctx.shadowBlur = 4;
+            ctx.fillText(`${quant} T=${r.configuration.threads} C=${r.configuration.context_size}`, x + 12, y - 8);
+            ctx.shadowBlur = 0;
         } else {
+            // Quantization-based coloring
+            let color = 'rgba(0, 212, 255, 0.25)';
+            if (quant === 'Q5_K_M') color = 'rgba(124, 92, 252, 0.25)';
+            else if (quant === 'Q8_0') color = 'rgba(34, 211, 167, 0.25)';
+
+            ctx.beginPath();
             ctx.arc(x, y, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+            ctx.fillStyle = color;
             ctx.fill();
+
+            // Subtle border
+            let borderColor = 'rgba(0, 212, 255, 0.15)';
+            if (quant === 'Q5_K_M') borderColor = 'rgba(124, 92, 252, 0.15)';
+            else if (quant === 'Q8_0') borderColor = 'rgba(34, 211, 167, 0.15)';
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1;
+            ctx.stroke();
         }
+
+        ctx.restore();
     });
+
+    // Draw legend in chart
+    const legendY = padTop + 8;
+    const legendX = w - padRight - 180;
+    ctx.font = '10px Outfit';
+
+    // Q4_K_M
+    ctx.beginPath();
+    ctx.arc(legendX, legendY, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+    ctx.fill();
+    ctx.fillStyle = '#8b99b0';
+    ctx.fillText('Q4_K_M', legendX + 10, legendY + 3);
+
+    // Q5_K_M
+    ctx.beginPath();
+    ctx.arc(legendX + 65, legendY, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(124, 92, 252, 0.5)';
+    ctx.fill();
+    ctx.fillStyle = '#8b99b0';
+    ctx.fillText('Q5_K_M', legendX + 75, legendY + 3);
+
+    // Q8_0
+    ctx.beginPath();
+    ctx.arc(legendX + 130, legendY, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(34, 211, 167, 0.5)';
+    ctx.fill();
+    ctx.fillStyle = '#8b99b0';
+    ctx.fillText('Q8_0', legendX + 140, legendY + 3);
 }

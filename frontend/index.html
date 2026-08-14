@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARMScale — Autonomous AI Inference Optimizer</title>
+    <meta name="description" content="ARMScale: Hardware-aware LLM inference optimizer with autonomous multi-dimensional hyperparameter search across quantization, threads, and context configurations.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -58,7 +59,7 @@
         <main class="dashboard-grid">
             <!-- Left: Workload & Optimizer Controls -->
             <div class="card control-card">
-                <h2 class="card-title">Optimization Controls</h2>
+                <h2 class="card-title">⚙️ Optimization Controls</h2>
                 
                 <div class="control-group">
                     <label for="workload-select">Workload Suite</label>
@@ -110,13 +111,13 @@
                     </select>
                 </div>
 
-                <button id="btn-recommend" class="btn btn-primary">Find Global Optimum</button>
+                <button id="btn-recommend" class="btn btn-primary">🔍 Find Global Optimum</button>
             </div>
 
             <!-- Middle: Active Recommendation Card -->
             <div class="card recommendation-card">
                 <div class="card-header-flex">
-                    <h2 class="card-title">Autonomous Deployment Decision</h2>
+                    <h2 class="card-title">🏆 Autonomous Deployment Decision</h2>
                     <span class="badge badge-accent" id="rec-obj-badge">SPEED OPTIMIZED</span>
                 </div>
 
@@ -147,7 +148,7 @@
 
             <!-- Right: Pareto Frontier Card -->
             <div class="card pareto-card">
-                <h2 class="card-title">3D Pareto Frontier</h2>
+                <h2 class="card-title">📐 3D Pareto Frontier</h2>
                 <p class="card-subtitle">Non-dominated trade-offs across (Latency ↓, Throughput ↑, Size ↓):</p>
                 <div class="pareto-list" id="pareto-list">
                     <!-- Populated dynamically -->
@@ -159,7 +160,7 @@
         <section class="card visual-section">
             <div class="card-header-flex">
                 <div>
-                    <h2 class="card-title">Global Trade-off Space (Latency vs. Throughput)</h2>
+                    <h2 class="card-title">📊 Global Trade-off Space (Latency vs. Throughput)</h2>
                     <p class="card-subtitle">Point radius reflects model footprint (468MB to 644MB). Cyan glow marks Pareto-optimal points.</p>
                 </div>
                 <div class="legend">
@@ -169,15 +170,15 @@
             </div>
 
             <div class="chart-wrapper">
-                <canvas id="paretoChart" width="900" height="340"></canvas>
+                <canvas id="paretoChart" width="900" height="360"></canvas>
             </div>
         </section>
 
         <!-- Detailed 36-Configuration Matrix Table -->
         <section class="card table-section">
             <div class="card-header-flex">
-                <h2 class="card-title">Complete 36-Configuration Global Search Matrix</h2>
-                <span class="badge" id="table-count-badge">36 Configurations</span>
+                <h2 class="card-title">📋 Complete 36-Configuration Global Search Matrix</h2>
+                <span class="badge badge-accent" id="table-count-badge">36 Configurations</span>
             </div>
             
             <div class="table-container">
