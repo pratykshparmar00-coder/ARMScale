@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-08-14T21:41:53.827280",
+  "architecture": "amd64",
+  "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+  "cores": 6,
+  "ram_gb": 15.42,
+  "model": "mock/mock",
+  "model_size_mb": 100,
+  "runtime": "mock",
+  "configuration": {
+    "quantization": "Q4_K_M",
+    "threads": 4,
+    "batch_size": 1,
+    "context_size": 2048
+  },
+  "benchmark_parameters": {
+    "warmups": 2,
+    "measured_runs": 5,
+    "max_tokens": 128
+  },
+  "results": {
+    "mean_latency_ms": 100.0,
+    "median_latency_ms": 100.0,
+    "p95_latency_ms": 100.0,
+    "mean_tokens_per_second": 100.0,
+    "runs": [
+      {
+        "prompt": "What is the capital of France?",
+        "latency_ms": 100.0,
+        "tokens_generated": 10,
+        "tokens_per_second": 100.0
+      },
+      {
+        "prompt": "Explain the theory of relativity in one simple paragraph.",
+        "latency_ms": 100.0,
+        "tokens_generated": 10,
+        "tokens_per_second": 100.0
+      },
+      {
+        "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+        "latency_ms": 100.0,
+        "tokens_generated": 10,
+        "tokens_per_second": 100.0
+      },
+      {
+        "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+        "latency_ms": 100.0,
+        "tokens_generated": 10,
+        "tokens_per_second": 100.0
+      },
+      {
+        "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+        "latency_ms": 100.0,
+        "tokens_generated": 10,
+        "tokens_per_second": 100.0
+      }
+    ]
+  }
+}

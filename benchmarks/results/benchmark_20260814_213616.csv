@@ -1,0 +1,2 @@
+Timestamp,Architecture,CPU,Cores,Model,Quantization,Threads,Mean_Latency_ms,Median_Latency_ms,P95_Latency_ms,Mean_TPS
+2026-08-14T21:36:16.727440,amd64,"AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",6,mock/mock,Q4_K_M,4,100.0,100.0,100.0,100.0

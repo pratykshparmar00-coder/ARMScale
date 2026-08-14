@@ -1,0 +1,104 @@
+{
+  "timestamp": "2026-08-14T22:23:37.123398",
+  "platform": {
+    "provider": "local",
+    "cloud_provider": null,
+    "architecture": "amd64",
+    "is_arm": false,
+    "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+    "machine_family": null,
+    "machine_type": null,
+    "processor_family": null,
+    "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "physical_cores": 6,
+    "logical_cores": 12,
+    "cpu_cores_physical": 6,
+    "cpu_cores_logical": 12,
+    "ram_gb": 15.42,
+    "zone": null,
+    "region": null,
+    "os": "Windows",
+    "os_release": "11",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "architecture": "amd64",
+  "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+  "cores": 6,
+  "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "model_size_mb": 468.6355895996094,
+  "runtime": "llama.cpp",
+  "workload": {
+    "type": "context_stress",
+    "prompt_suite_version": "v1.0",
+    "prompts_count": 5,
+    "estimated_input_tokens_per_prompt": 650,
+    "max_tokens": 128,
+    "temperature": 0.0,
+    "token_accounting": "completion_tokens_only"
+  },
+  "configuration": {
+    "quantization": "Q4_K_M",
+    "threads": 4,
+    "context_size": 4096,
+    "batch_size": 1
+  },
+  "benchmark_parameters": {
+    "warmups": 2,
+    "measured_runs": 5,
+    "max_tokens": 128
+  },
+  "results": {
+    "mean_latency_ms": 5173.900460003642,
+    "median_latency_ms": 5583.53440000792,
+    "p95_latency_ms": 5714.502100006212,
+    "min_latency_ms": 3973.8592999929097,
+    "max_latency_ms": 5726.547900005244,
+    "std_latency_ms": 745.0914200009012,
+    "mean_tokens_per_second": 20.82491362663491,
+    "median_tokens_per_second": 22.352035158892637,
+    "p95_tokens_per_second": 25.33414035391771,
+    "min_tokens_per_second": 15.044234347312491,
+    "max_tokens_per_second": 26.02027003428588,
+    "std_tokens_per_second": 4.277249524759205,
+    "memory_mb": null,
+    "memory_status": "unavailable",
+    "runs": [
+      {
+        "run_index": 1,
+        "prompt": "Based on the following document, explain why hyperscalers are adopting Arm-based...",
+        "latency_ms": 5726.547900005244,
+        "tokens_generated": 128,
+        "tokens_per_second": 22.352035158892637
+      },
+      {
+        "run_index": 2,
+        "prompt": "Based on the following document, what is the architectural difference between Go...",
+        "latency_ms": 5583.53440000792,
+        "tokens_generated": 84,
+        "tokens_per_second": 15.044234347312491
+      },
+      {
+        "run_index": 3,
+        "prompt": "Based on the following document, identify the primary bottleneck in autoregressi...",
+        "latency_ms": 3973.8592999929097,
+        "tokens_generated": 72,
+        "tokens_per_second": 18.11840696023849
+      },
+      {
+        "run_index": 4,
+        "prompt": "Based on the following document, what happens when thread counts exceed physical...",
+        "latency_ms": 5666.318900010083,
+        "tokens_generated": 128,
+        "tokens_per_second": 22.58962163244505
+      },
+      {
+        "run_index": 5,
+        "prompt": "Based on the following document, summarize the three key operational variables t...",
+        "latency_ms": 4919.241800002055,
+        "tokens_generated": 128,
+        "tokens_per_second": 26.02027003428588
+      }
+    ]
+  }
+}

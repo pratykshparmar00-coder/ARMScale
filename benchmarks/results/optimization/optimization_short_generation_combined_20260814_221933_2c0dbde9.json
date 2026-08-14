@@ -1,0 +1,1580 @@
+{
+  "experiment_id": "2c0dbde9",
+  "dimension": "combined",
+  "workload_type": "short_generation",
+  "platform": {
+    "provider": "local",
+    "cloud_provider": null,
+    "architecture": "amd64",
+    "is_arm": false,
+    "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+    "machine_family": null,
+    "machine_type": null,
+    "processor_family": null,
+    "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "physical_cores": 6,
+    "logical_cores": 12,
+    "cpu_cores_physical": 6,
+    "cpu_cores_logical": 12,
+    "ram_gb": 15.42,
+    "zone": null,
+    "region": null,
+    "os": "Windows",
+    "os_release": "11",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "baseline": {
+    "timestamp": "2026-08-14T21:36:59.038459",
+    "architecture": "amd64",
+    "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cores": 6,
+    "ram_gb": 15.42,
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "model_size_mb": 468.6355895996094,
+    "runtime": "llama.cpp",
+    "configuration": {
+      "quantization": "Q4_K_M",
+      "threads": 4,
+      "batch_size": 1,
+      "context_size": 2048
+    },
+    "benchmark_parameters": {
+      "warmups": 2,
+      "measured_runs": 5,
+      "max_tokens": 128
+    },
+    "results": {
+      "mean_latency_ms": 2671.4205600030255,
+      "median_latency_ms": 3468.526800017571,
+      "p95_latency_ms": 3723.296100011794,
+      "mean_tokens_per_second": 32.73283275974917,
+      "runs": [
+        {
+          "prompt": "What is the capital of France?",
+          "latency_ms": 327.83150000614114,
+          "tokens_generated": 7,
+          "tokens_per_second": 21.35243257548122
+        },
+        {
+          "prompt": "Explain the theory of relativity in one simple paragraph.",
+          "latency_ms": 3550.099299987778,
+          "tokens_generated": 128,
+          "tokens_per_second": 36.05532949471038
+        },
+        {
+          "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+          "latency_ms": 3723.296100011794,
+          "tokens_generated": 128,
+          "tokens_per_second": 34.37814145364226
+        },
+        {
+          "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+          "latency_ms": 2287.349099991843,
+          "tokens_generated": 80,
+          "tokens_per_second": 34.97498479802899
+        },
+        {
+          "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+          "latency_ms": 3468.526800017571,
+          "tokens_generated": 128,
+          "tokens_per_second": 36.90327547688303
+        }
+      ]
+    }
+  },
+  "configurations_tested": 12,
+  "results": [
+    {
+      "timestamp": "2026-08-14T22:18:49.332041",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 6,
+        "context_size": 4096,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 1974.9810799956322,
+        "median_latency_ms": 2614.6752999920864,
+        "p95_latency_ms": 2675.935359997675,
+        "min_latency_ms": 236.18519998854026,
+        "max_latency_ms": 2679.7785999951884,
+        "std_latency_ms": 1058.799260195564,
+        "mean_tokens_per_second": 44.39635476739193,
+        "median_tokens_per_second": 47.7651400008306,
+        "p95_tokens_per_second": 48.785588459532484,
+        "min_tokens_per_second": 29.63775884492187,
+        "max_tokens_per_second": 48.95445335043606,
+        "std_tokens_per_second": 8.26823417897585,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 236.18519998854026,
+            "tokens_generated": 7,
+            "tokens_per_second": 29.63775884492187
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 2679.7785999951884,
+            "tokens_generated": 128,
+            "tokens_per_second": 47.7651400008306
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 2660.5624000076205,
+            "tokens_generated": 128,
+            "tokens_per_second": 48.110128895918166
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1683.7038999947254,
+            "tokens_generated": 80,
+            "tokens_per_second": 47.51429274485295
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2614.6752999920864,
+            "tokens_generated": 128,
+            "tokens_per_second": 48.95445335043606
+          }
+        ]
+      },
+      "score": 1.0,
+      "pareto_optimal": true
+    },
+    {
+      "timestamp": "2026-08-14T22:18:25.163870",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 6,
+        "context_size": 1024,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2013.6969800048973,
+        "median_latency_ms": 2640.9654000017326,
+        "p95_latency_ms": 2757.1561600081623,
+        "min_latency_ms": 262.6882999902591,
+        "max_latency_ms": 2779.4660000072327,
+        "std_latency_ms": 1067.9028577361598,
+        "mean_tokens_per_second": 43.14498517606007,
+        "median_tokens_per_second": 46.580729877751594,
+        "p95_tokens_per_second": 48.36920157955139,
+        "min_tokens_per_second": 26.647551490719497,
+        "max_tokens_per_second": 48.46712493844714,
+        "std_tokens_per_second": 9.274951635734299,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 262.6882999902591,
+            "tokens_generated": 7,
+            "tokens_per_second": 26.647551490719497
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 2779.4660000072327,
+            "tokens_generated": 128,
+            "tokens_per_second": 46.05201142941375
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 2667.9168000118807,
+            "tokens_generated": 128,
+            "tokens_per_second": 47.97750814396836
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1717.4484000133816,
+            "tokens_generated": 80,
+            "tokens_per_second": 46.580729877751594
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2640.9654000017326,
+            "tokens_generated": 128,
+            "tokens_per_second": 48.46712493844714
+          }
+        ]
+      },
+      "score": 0.9588386617035651,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:17:58.724830",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 4,
+        "context_size": 2048,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2168.556920008268,
+        "median_latency_ms": 2791.2247000203934,
+        "p95_latency_ms": 3073.089540010551,
+        "min_latency_ms": 274.4457999942824,
+        "max_latency_ms": 3113.4895000141114,
+        "std_latency_ms": 1182.5423982142627,
+        "mean_tokens_per_second": 40.41954289149063,
+        "median_tokens_per_second": 43.96374818023992,
+        "p95_tokens_per_second": 45.818122044776366,
+        "min_tokens_per_second": 25.50594689423497,
+        "max_tokens_per_second": 45.858006343618555,
+        "std_tokens_per_second": 8.551021683420807,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 274.4457999942824,
+            "tokens_generated": 7,
+            "tokens_per_second": 25.50594689423497
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3113.4895000141114,
+            "tokens_generated": 128,
+            "tokens_per_second": 41.1114281899521
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 2911.4896999963094,
+            "tokens_generated": 128,
+            "tokens_per_second": 43.96374818023992
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1752.1349000162445,
+            "tokens_generated": 80,
+            "tokens_per_second": 45.658584849407596
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2791.2247000203934,
+            "tokens_generated": 128,
+            "tokens_per_second": 45.858006343618555
+          }
+        ]
+      },
+      "score": 0.8090202153986837,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:17:46.328895",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 4,
+        "context_size": 1024,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2174.275419994956,
+        "median_latency_ms": 2690.6312000064645,
+        "p95_latency_ms": 3078.4570999850985,
+        "min_latency_ms": 251.2953999976162,
+        "max_latency_ms": 3106.1090999864973,
+        "std_latency_ms": 1179.424787680607,
+        "mean_tokens_per_second": 40.5762751708037,
+        "median_tokens_per_second": 43.11524224584356,
+        "p95_tokens_per_second": 46.68375979399234,
+        "min_tokens_per_second": 27.855663096365483,
+        "max_tokens_per_second": 47.572480390360624,
+        "std_tokens_per_second": 7.485376983982662,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 251.2953999976162,
+            "tokens_generated": 7,
+            "tokens_per_second": 27.855663096365483
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 2690.6312000064645,
+            "tokens_generated": 128,
+            "tokens_per_second": 47.572480390360624
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3106.1090999864973,
+            "tokens_generated": 128,
+            "tokens_per_second": 41.20911271292964
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1855.4923000046983,
+            "tokens_generated": 80,
+            "tokens_per_second": 43.11524224584356
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2967.849099979503,
+            "tokens_generated": 128,
+            "tokens_per_second": 43.12887740851919
+          }
+        ]
+      },
+      "score": 0.8051612169600201,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:18:37.972687",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 6,
+        "context_size": 2048,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2186.073199985549,
+        "median_latency_ms": 2753.1106999958865,
+        "p95_latency_ms": 3040.033499983838,
+        "min_latency_ms": 396.3833999878261,
+        "max_latency_ms": 3049.1585999843664,
+        "std_latency_ms": 1134.3879629433115,
+        "mean_tokens_per_second": 39.00785466486818,
+        "median_tokens_per_second": 42.61647724167877,
+        "p95_tokens_per_second": 46.45258458939121,
+        "min_tokens_per_second": 17.659669905992498,
+        "max_tokens_per_second": 46.49286350897232,
+        "std_tokens_per_second": 12.110636052368024,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 396.3833999878261,
+            "tokens_generated": 7,
+            "tokens_per_second": 17.659669905992498
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3003.5330999817234,
+            "tokens_generated": 128,
+            "tokens_per_second": 42.61647724167877
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3049.1585999843664,
+            "tokens_generated": 128,
+            "tokens_per_second": 41.97879375663053
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1728.1801999779418,
+            "tokens_generated": 80,
+            "tokens_per_second": 46.291468911066744
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2753.1106999958865,
+            "tokens_generated": 128,
+            "tokens_per_second": 46.49286350897232
+          }
+        ]
+      },
+      "score": 0.7849002838191363,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:19:18.821468",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 8,
+        "context_size": 2048,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2329.8538400034886,
+        "median_latency_ms": 2823.6023999925237,
+        "p95_latency_ms": 3464.445780002279,
+        "min_latency_ms": 233.7112000095658,
+        "max_latency_ms": 3486.1332000000402,
+        "std_latency_ms": 1363.326171565141,
+        "mean_tokens_per_second": 39.2378243885111,
+        "median_tokens_per_second": 37.895653193777335,
+        "p95_tokens_per_second": 46.100762486884655,
+        "min_tokens_per_second": 29.951495690893246,
+        "max_tokens_per_second": 46.29291273433615,
+        "std_tokens_per_second": 6.732525645064148,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 233.7112000095658,
+            "tokens_generated": 7,
+            "tokens_per_second": 29.951495690893246
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3377.696100011235,
+            "tokens_generated": 128,
+            "tokens_per_second": 37.895653193777335
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3486.1332000000402,
+            "tokens_generated": 128,
+            "tokens_per_second": 36.71689882647012
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1728.126300004078,
+            "tokens_generated": 80,
+            "tokens_per_second": 46.29291273433615
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2823.6023999925237,
+            "tokens_generated": 128,
+            "tokens_per_second": 45.332161497078665
+          }
+        ]
+      },
+      "score": 0.6637474963702261,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:19:33.502964",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 8,
+        "context_size": 4096,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2603.4507400065195,
+        "median_latency_ms": 3186.2052000069525,
+        "p95_latency_ms": 3993.1759200117085,
+        "min_latency_ms": 234.08540000673383,
+        "max_latency_ms": 4181.7035000131,
+        "std_latency_ms": 1502.5753909242546,
+        "mean_tokens_per_second": 35.39306619421605,
+        "median_tokens_per_second": 36.76142843883045,
+        "p95_tokens_per_second": 40.04205915345586,
+        "min_tokens_per_second": 29.903616371626057,
+        "max_tokens_per_second": 40.17318156398737,
+        "std_tokens_per_second": 4.866972236882274,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 234.08540000673383,
+            "tokens_generated": 7,
+            "tokens_per_second": 29.903616371626057
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3186.2052000069525,
+            "tokens_generated": 128,
+            "tokens_per_second": 40.17318156398737
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3239.0656000061426,
+            "tokens_generated": 128,
+            "tokens_per_second": 39.51756951132983
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2176.1939999996684,
+            "tokens_generated": 80,
+            "tokens_per_second": 36.76142843883045
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 4181.7035000131,
+            "tokens_generated": 128,
+            "tokens_per_second": 30.609535085306508
+          }
+        ]
+      },
+      "score": 0.4053665975464626,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:18:13.616527",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 4,
+        "context_size": 4096,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2610.163900000043,
+        "median_latency_ms": 2915.5087000108324,
+        "p95_latency_ms": 3571.5034599998035,
+        "min_latency_ms": 302.71399999037385,
+        "max_latency_ms": 3585.9792999981437,
+        "std_latency_ms": 1341.7401138786702,
+        "mean_tokens_per_second": 33.68468042164494,
+        "median_tokens_per_second": 35.69457302781036,
+        "p95_tokens_per_second": 42.40848996097291,
+        "min_tokens_per_second": 23.12413697490898,
+        "max_tokens_per_second": 43.90314458657744,
+        "std_tokens_per_second": 7.857996522499551,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 302.71399999037385,
+            "tokens_generated": 7,
+            "tokens_per_second": 23.12413697490898
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3585.9792999981437,
+            "tokens_generated": 128,
+            "tokens_per_second": 35.69457302781036
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3513.6001000064425,
+            "tokens_generated": 128,
+            "tokens_per_second": 36.4298714585548
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2733.0173999944236,
+            "tokens_generated": 80,
+            "tokens_per_second": 29.271676060373135
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2915.5087000108324,
+            "tokens_generated": 128,
+            "tokens_per_second": 43.90314458657744
+          }
+        ]
+      },
+      "score": 0.3885329614007318,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:17:16.842203",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 2,
+        "context_size": 2048,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2808.8233800022863,
+        "median_latency_ms": 3590.8065999974497,
+        "p95_latency_ms": 4090.7550799951423,
+        "min_latency_ms": 282.1140000014566,
+        "max_latency_ms": 4181.123899994418,
+        "std_latency_ms": 1583.2359679962565,
+        "mean_tokens_per_second": 32.15636615338249,
+        "median_tokens_per_second": 34.32298107534525,
+        "p95_tokens_per_second": 35.59443362948968,
+        "min_tokens_per_second": 24.812664383773434,
+        "max_tokens_per_second": 35.64658703704369,
+        "std_tokens_per_second": 4.572055534273403,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 282.1140000014566,
+            "tokens_generated": 7,
+            "tokens_per_second": 24.812664383773434
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3590.8065999974497,
+            "tokens_generated": 128,
+            "tokens_per_second": 35.64658703704369
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3729.2797999980394,
+            "tokens_generated": 128,
+            "tokens_per_second": 34.32298107534525
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2260.7926000200678,
+            "tokens_generated": 80,
+            "tokens_per_second": 35.38581999927366
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 4181.123899994418,
+            "tokens_generated": 128,
+            "tokens_per_second": 30.613778271476452
+          }
+        ]
+      },
+      "score": 0.20913577062909292,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:17:01.250714",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 2,
+        "context_size": 1024,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2815.5434000073,
+        "median_latency_ms": 3693.5790000134148,
+        "p95_latency_ms": 3893.241260002833,
+        "min_latency_ms": 302.0896000089124,
+        "max_latency_ms": 3933.200100000249,
+        "std_latency_ms": 1528.079300769991,
+        "mean_tokens_per_second": 31.55508350996167,
+        "median_tokens_per_second": 33.120226754310075,
+        "p95_tokens_per_second": 34.58079726057985,
+        "min_tokens_per_second": 23.17193309466292,
+        "max_tokens_per_second": 34.65473460823096,
+        "std_tokens_per_second": 4.763516158691751,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 302.0896000089124,
+            "tokens_generated": 7,
+            "tokens_per_second": 23.17193309466292
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3693.5790000134148,
+            "tokens_generated": 128,
+            "tokens_per_second": 34.65473460823096
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3733.4059000131674,
+            "tokens_generated": 128,
+            "tokens_per_second": 34.285047869975394
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2415.4424000007566,
+            "tokens_generated": 80,
+            "tokens_per_second": 33.120226754310075
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 3933.200100000249,
+            "tokens_generated": 128,
+            "tokens_per_second": 32.543475222629
+          }
+        ]
+      },
+      "score": 0.1994941769693505,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:19:05.575563",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 8,
+        "context_size": 1024,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 2933.015340002021,
+        "median_latency_ms": 3583.1623999984004,
+        "p95_latency_ms": 3944.987060013227,
+        "min_latency_ms": 348.3083000173792,
+        "max_latency_ms": 3979.4777000206523,
+        "std_latency_ms": 1496.8780552820829,
+        "mean_tokens_per_second": 29.7504300253317,
+        "median_tokens_per_second": 32.16502507334963,
+        "p95_tokens_per_second": 35.3025191046364,
+        "min_tokens_per_second": 20.097138080403848,
+        "max_tokens_per_second": 35.72263428530539,
+        "std_tokens_per_second": 6.2541941245983,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 348.3083000173792,
+            "tokens_generated": 7,
+            "tokens_per_second": 20.097138080403848
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3583.1623999984004,
+            "tokens_generated": 128,
+            "tokens_per_second": 35.72263428530539
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 3979.4777000206523,
+            "tokens_generated": 128,
+            "tokens_per_second": 32.16502507334963
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2947.1037999901455,
+            "tokens_generated": 80,
+            "tokens_per_second": 27.14529430563915
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 3807.0244999835268,
+            "tokens_generated": 128,
+            "tokens_per_second": 33.62205838196047
+          }
+        ]
+      },
+      "score": 0.08755505207850924,
+      "pareto_optimal": false
+    },
+    {
+      "timestamp": "2026-08-14T22:17:33.613849",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 2,
+        "context_size": 4096,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 3030.054379993817,
+        "median_latency_ms": 3803.9790999901015,
+        "p95_latency_ms": 4201.123559998814,
+        "min_latency_ms": 347.8115999896545,
+        "max_latency_ms": 4241.763300000457,
+        "std_latency_ms": 1610.5899119169137,
+        "mean_tokens_per_second": 29.015423969900603,
+        "median_tokens_per_second": 30.176129818461632,
+        "p95_tokens_per_second": 33.25806634783769,
+        "min_tokens_per_second": 20.12583824176138,
+        "max_tokens_per_second": 33.648975621431006,
+        "std_tokens_per_second": 5.224752805054207,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 347.8115999896545,
+            "tokens_generated": 7,
+            "tokens_per_second": 20.12583824176138
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 3803.9790999901015,
+            "tokens_generated": 128,
+            "tokens_per_second": 33.648975621431006
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 4038.5645999922417,
+            "tokens_generated": 128,
+            "tokens_per_second": 31.694429253464435
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 2718.1532999966294,
+            "tokens_generated": 80,
+            "tokens_per_second": 29.431746914384558
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 4241.763300000457,
+            "tokens_generated": 128,
+            "tokens_per_second": 30.176129818461632
+          }
+        ]
+      },
+      "score": 0.0,
+      "pareto_optimal": false
+    }
+  ],
+  "best_configuration": {
+    "timestamp": "2026-08-14T22:18:49.332041",
+    "platform": {
+      "provider": "local",
+      "cloud_provider": null,
+      "architecture": "amd64",
+      "is_arm": false,
+      "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+      "machine_family": null,
+      "machine_type": null,
+      "processor_family": null,
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "physical_cores": 6,
+      "logical_cores": 12,
+      "cpu_cores_physical": 6,
+      "cpu_cores_logical": 12,
+      "ram_gb": 15.42,
+      "zone": null,
+      "region": null,
+      "os": "Windows",
+      "os_release": "11",
+      "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+    },
+    "architecture": "amd64",
+    "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cores": 6,
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "model_size_mb": 468.6355895996094,
+    "runtime": "llama.cpp",
+    "workload": {
+      "type": "short_generation",
+      "prompt_suite_version": "v1.0",
+      "prompts_count": 5,
+      "estimated_input_tokens_per_prompt": 15,
+      "max_tokens": 128,
+      "temperature": 0.0,
+      "token_accounting": "completion_tokens_only"
+    },
+    "configuration": {
+      "quantization": "Q4_K_M",
+      "threads": 6,
+      "context_size": 4096,
+      "batch_size": 1
+    },
+    "benchmark_parameters": {
+      "warmups": 2,
+      "measured_runs": 5,
+      "max_tokens": 128
+    },
+    "results": {
+      "mean_latency_ms": 1974.9810799956322,
+      "median_latency_ms": 2614.6752999920864,
+      "p95_latency_ms": 2675.935359997675,
+      "min_latency_ms": 236.18519998854026,
+      "max_latency_ms": 2679.7785999951884,
+      "std_latency_ms": 1058.799260195564,
+      "mean_tokens_per_second": 44.39635476739193,
+      "median_tokens_per_second": 47.7651400008306,
+      "p95_tokens_per_second": 48.785588459532484,
+      "min_tokens_per_second": 29.63775884492187,
+      "max_tokens_per_second": 48.95445335043606,
+      "std_tokens_per_second": 8.26823417897585,
+      "memory_mb": null,
+      "memory_status": "unavailable",
+      "runs": [
+        {
+          "run_index": 1,
+          "prompt": "What is the capital of France?",
+          "latency_ms": 236.18519998854026,
+          "tokens_generated": 7,
+          "tokens_per_second": 29.63775884492187
+        },
+        {
+          "run_index": 2,
+          "prompt": "Explain the theory of relativity in one simple paragraph.",
+          "latency_ms": 2679.7785999951884,
+          "tokens_generated": 128,
+          "tokens_per_second": 47.7651400008306
+        },
+        {
+          "run_index": 3,
+          "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+          "latency_ms": 2660.5624000076205,
+          "tokens_generated": 128,
+          "tokens_per_second": 48.110128895918166
+        },
+        {
+          "run_index": 4,
+          "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+          "latency_ms": 1683.7038999947254,
+          "tokens_generated": 80,
+          "tokens_per_second": 47.51429274485295
+        },
+        {
+          "run_index": 5,
+          "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+          "latency_ms": 2614.6752999920864,
+          "tokens_generated": 128,
+          "tokens_per_second": 48.95445335043606
+        }
+      ]
+    },
+    "score": 1.0,
+    "pareto_optimal": true
+  },
+  "pareto_configurations": [
+    {
+      "timestamp": "2026-08-14T22:18:49.332041",
+      "platform": {
+        "provider": "local",
+        "cloud_provider": null,
+        "architecture": "amd64",
+        "is_arm": false,
+        "status_message": "DEVELOPMENT ENVIRONMENT \u2014 x86_64",
+        "machine_family": null,
+        "machine_type": null,
+        "processor_family": null,
+        "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+        "physical_cores": 6,
+        "logical_cores": 12,
+        "cpu_cores_physical": 6,
+        "cpu_cores_logical": 12,
+        "ram_gb": 15.42,
+        "zone": null,
+        "region": null,
+        "os": "Windows",
+        "os_release": "11",
+        "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+      },
+      "architecture": "amd64",
+      "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+      "cores": 6,
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_size_mb": 468.6355895996094,
+      "runtime": "llama.cpp",
+      "workload": {
+        "type": "short_generation",
+        "prompt_suite_version": "v1.0",
+        "prompts_count": 5,
+        "estimated_input_tokens_per_prompt": 15,
+        "max_tokens": 128,
+        "temperature": 0.0,
+        "token_accounting": "completion_tokens_only"
+      },
+      "configuration": {
+        "quantization": "Q4_K_M",
+        "threads": 6,
+        "context_size": 4096,
+        "batch_size": 1
+      },
+      "benchmark_parameters": {
+        "warmups": 2,
+        "measured_runs": 5,
+        "max_tokens": 128
+      },
+      "results": {
+        "mean_latency_ms": 1974.9810799956322,
+        "median_latency_ms": 2614.6752999920864,
+        "p95_latency_ms": 2675.935359997675,
+        "min_latency_ms": 236.18519998854026,
+        "max_latency_ms": 2679.7785999951884,
+        "std_latency_ms": 1058.799260195564,
+        "mean_tokens_per_second": 44.39635476739193,
+        "median_tokens_per_second": 47.7651400008306,
+        "p95_tokens_per_second": 48.785588459532484,
+        "min_tokens_per_second": 29.63775884492187,
+        "max_tokens_per_second": 48.95445335043606,
+        "std_tokens_per_second": 8.26823417897585,
+        "memory_mb": null,
+        "memory_status": "unavailable",
+        "runs": [
+          {
+            "run_index": 1,
+            "prompt": "What is the capital of France?",
+            "latency_ms": 236.18519998854026,
+            "tokens_generated": 7,
+            "tokens_per_second": 29.63775884492187
+          },
+          {
+            "run_index": 2,
+            "prompt": "Explain the theory of relativity in one simple paragraph.",
+            "latency_ms": 2679.7785999951884,
+            "tokens_generated": 128,
+            "tokens_per_second": 47.7651400008306
+          },
+          {
+            "run_index": 3,
+            "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+            "latency_ms": 2660.5624000076205,
+            "tokens_generated": 128,
+            "tokens_per_second": 48.110128895918166
+          },
+          {
+            "run_index": 4,
+            "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+            "latency_ms": 1683.7038999947254,
+            "tokens_generated": 80,
+            "tokens_per_second": 47.51429274485295
+          },
+          {
+            "run_index": 5,
+            "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+            "latency_ms": 2614.6752999920864,
+            "tokens_generated": 128,
+            "tokens_per_second": 48.95445335043606
+          }
+        ]
+      },
+      "score": 1.0,
+      "pareto_optimal": true
+    }
+  ],
+  "improvement_vs_baseline": {
+    "latency_pct": 26.070005241204125,
+    "throughput_pct": 35.63248586900528,
+    "memory_pct": null
+  },
+  "execution_time_s": 167.93490767478943
+}

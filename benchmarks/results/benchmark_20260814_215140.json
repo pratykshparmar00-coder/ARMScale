@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-08-14T21:51:40.307864",
+  "architecture": "amd64",
+  "cpu": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+  "cores": 6,
+  "logical_cores": 12,
+  "ram_gb": 15.42,
+  "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+  "model_filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "model_size_mb": 468.6355895996094,
+  "runtime": "llama.cpp",
+  "configuration": {
+    "quantization": "Q4_K_M",
+    "threads": 2,
+    "batch_size": 1,
+    "context_size": 2048
+  },
+  "benchmark_parameters": {
+    "warmups": 2,
+    "measured_runs": 5,
+    "max_tokens": 128,
+    "temperature": 0.0,
+    "token_accounting": "completion_tokens_only"
+  },
+  "results": {
+    "mean_latency_ms": 2882.0849000068847,
+    "median_latency_ms": 3452.3834999999963,
+    "p95_latency_ms": 4059.638920001453,
+    "min_latency_ms": 296.73640002147295,
+    "max_latency_ms": 4077.6476000028197,
+    "std_latency_ms": 1560.6589004349362,
+    "mean_tokens_per_second": 30.994386425754172,
+    "median_tokens_per_second": 31.39064788235047,
+    "p95_tokens_per_second": 36.080562701055534,
+    "min_tokens_per_second": 23.589960650238577,
+    "max_tokens_per_second": 37.075834709556496,
+    "std_tokens_per_second": 4.827514735882675,
+    "memory_mb": null,
+    "memory_status": "unavailable",
+    "runs": [
+      {
+        "run_index": 1,
+        "prompt": "What is the capital of France?",
+        "latency_ms": 296.73640002147295,
+        "tokens_generated": 7,
+        "tokens_per_second": 23.589960650238577
+      },
+      {
+        "run_index": 2,
+        "prompt": "Explain the theory of relativity in one simple paragraph.",
+        "latency_ms": 4077.6476000028197,
+        "tokens_generated": 128,
+        "tokens_per_second": 31.39064788235047
+      },
+      {
+        "run_index": 3,
+        "prompt": "Write a Python function to calculate the Fibonacci sequence.",
+        "latency_ms": 3987.6041999959853,
+        "tokens_generated": 128,
+        "tokens_per_second": 32.09947466705168
+      },
+      {
+        "run_index": 4,
+        "prompt": "Summarize the plot of Romeo and Juliet in 3 sentences.",
+        "latency_ms": 2596.0528000141494,
+        "tokens_generated": 80,
+        "tokens_per_second": 30.816014219573642
+      },
+      {
+        "run_index": 5,
+        "prompt": "List 5 benefits of using Arm64 processors in cloud computing.",
+        "latency_ms": 3452.3834999999963,
+        "tokens_generated": 128,
+        "tokens_per_second": 37.075834709556496
+      }
+    ]
+  }
+}
