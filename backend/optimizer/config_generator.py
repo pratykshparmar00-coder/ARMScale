@@ -1,11 +1,14 @@
 from typing import List, Optional
 from backend.platform.detector import get_platform
+from backend.inference.models import AVAILABLE_VARIANTS
 from .models import OptimizationConfig, OptimizationDimension
 from backend.config import config
 
 VALID_THREADS_MATRIX = [2, 4, 6, 8]
 VALID_CONTEXT_MATRIX = [1024, 2048, 4096]
-DEFAULT_OPTIMIZED_THREADS = 4 # Validated baseline thread count
+VALID_QUANTIZATION_MATRIX = ["Q4_K_M", "Q5_K_M", "Q8_0"]
+DEFAULT_OPTIMIZED_THREADS = 6 # Optimal thread count discovered in Phase F
+DEFAULT_OPTIMIZED_CONTEXT = 4096 # Optimal context window discovered in Phase F
 
 class ConfigurationGenerator:
     def __init__(self):
@@ -36,13 +39,26 @@ class ConfigurationGenerator:
             return sorted([c for c in override_contexts if 512 <= c <= 32768])
         return sorted(VALID_CONTEXT_MATRIX)
 
+    def generate_quantization_candidates(self, override_quantizations: Optional[List[str]] = None) -> List[str]:
+        """Validates and returns quantization candidates from the verified catalog."""
+        if override_quantizations:
+            valid = []
+            for q in override_quantizations:
+                q_upper = q.upper()
+                if q_upper in AVAILABLE_VARIANTS:
+                    valid.append(q_upper)
+            return valid if valid else ["Q4_K_M"]
+        return list(VALID_QUANTIZATION_MATRIX)
+
     def generate_configurations(
         self, 
         dimension: OptimizationDimension = OptimizationDimension.THREADS,
         override_threads: Optional[List[int]] = None,
         override_contexts: Optional[List[int]] = None,
+        override_quantizations: Optional[List[str]] = None,
         fixed_thread_count: int = DEFAULT_OPTIMIZED_THREADS,
-        fixed_context_size: int = 2048
+        fixed_context_size: int = DEFAULT_OPTIMIZED_CONTEXT,
+        fixed_quantization: str = "Q4_K_M"
     ) -> List[OptimizationConfig]:
         """Generates candidate optimization configurations according to the target dimension."""
         configs = []
@@ -53,6 +69,7 @@ class ConfigurationGenerator:
                 configs.append(OptimizationConfig(
                     threads=t,
                     context_size=fixed_context_size,
+                    quantization=fixed_quantization,
                     batch_size=1
                 ))
                 
@@ -62,19 +79,34 @@ class ConfigurationGenerator:
                 configs.append(OptimizationConfig(
                     threads=fixed_thread_count,
                     context_size=c,
+                    quantization=fixed_quantization,
+                    batch_size=1
+                ))
+
+        elif dimension == OptimizationDimension.QUANTIZATION:
+            quant_candidates = self.generate_quantization_candidates(override_quantizations)
+            for q in quant_candidates:
+                configs.append(OptimizationConfig(
+                    threads=fixed_thread_count,
+                    context_size=fixed_context_size,
+                    quantization=q,
                     batch_size=1
                 ))
                 
         elif dimension == OptimizationDimension.COMBINED:
-            # 12-configuration joint matrix: Threads [2, 4, 6, 8] x Context [1024, 2048, 4096]
+            # Multi-dimensional search across threads and context, or threads x context x quantization
             threads_pool = override_threads if override_threads is not None else VALID_THREADS_MATRIX
             context_pool = override_contexts if override_contexts is not None else VALID_CONTEXT_MATRIX
-            for t in sorted(list(set(threads_pool))):
-                for c in sorted(list(set(context_pool))):
-                    configs.append(OptimizationConfig(
-                        threads=t,
-                        context_size=c,
-                        batch_size=1
-                    ))
+            quant_pool = override_quantizations if override_quantizations is not None else [fixed_quantization]
+            
+            for q in quant_pool:
+                for t in sorted(list(set(threads_pool))):
+                    for c in sorted(list(set(context_pool))):
+                        configs.append(OptimizationConfig(
+                            threads=t,
+                            context_size=c,
+                            quantization=q,
+                            batch_size=1
+                        ))
                     
         return configs

@@ -79,14 +79,15 @@ class OptimizationEngine:
         ref_baseline = self.get_reference_baseline(request.workload_type)
         original_threads = config.MODEL_THREADS
         original_context = config.MODEL_CONTEXT_SIZE
+        original_quant = "Q4_K_M"
         
         if not ref_baseline:
             print(f"No existing baseline found for workload '{w_type.value}'. Running initial baseline...")
-            # Load with default 4 threads, 2048 context
-            self.inference_engine.load_model(threads=original_threads, context_size=original_context)
+            self.inference_engine.load_model(threads=original_threads, context_size=original_context, quantization=original_quant)
             ref_baseline = self.benchmark_engine.run_baseline(
                 threads=original_threads, 
                 context_size=original_context,
+                quantization=original_quant,
                 workload_type=w_type, 
                 save=True
             )
@@ -98,8 +99,10 @@ class OptimizationEngine:
             dimension=dim,
             override_threads=request.threads_to_test,
             override_contexts=request.context_sizes_to_test,
-            fixed_thread_count=4,
-            fixed_context_size=2048
+            override_quantizations=request.quantizations_to_test,
+            fixed_thread_count=6,
+            fixed_context_size=4096,
+            fixed_quantization="Q4_K_M"
         )
         self.jobs[experiment_id]["total"] = len(configs)
         
@@ -110,11 +113,15 @@ class OptimizationEngine:
             self.jobs[experiment_id]["completed"] = idx
             self.jobs[experiment_id]["current_configuration"] = cfg.dict()
             
-            print(f"\n[{idx+1}/{len(configs)}] Testing configuration: Threads={cfg.threads}, Context={cfg.context_size}")
+            print(f"\n[{idx+1}/{len(configs)}] Testing configuration: Quant={cfg.quantization}, Threads={cfg.threads}, Context={cfg.context_size}")
             
             # Safely unload and reload model with candidate parameters
             self.inference_engine.unload_model()
-            success = self.inference_engine.load_model(threads=cfg.threads, context_size=cfg.context_size)
+            success = self.inference_engine.load_model(
+                threads=cfg.threads, 
+                context_size=cfg.context_size,
+                quantization=cfg.quantization
+            )
             if not success:
                 print(f"Failed to load model for configuration {cfg.dict()}, skipping.")
                 continue
@@ -123,11 +130,13 @@ class OptimizationEngine:
             bench_res = self.benchmark_engine.run_baseline(
                 threads=cfg.threads,
                 context_size=cfg.context_size,
+                quantization=cfg.quantization,
                 workload_type=w_type,
                 save=True
             )
             bench_res['configuration']['threads'] = cfg.threads
             bench_res['configuration']['context_size'] = cfg.context_size
+            bench_res['configuration']['quantization'] = cfg.quantization
             results.append(bench_res)
             
         # 4. Score and Analyze Results
@@ -173,7 +182,7 @@ class OptimizationEngine:
         
         # Restore baseline model state
         self.inference_engine.unload_model()
-        self.inference_engine.load_model(threads=original_threads, context_size=original_context)
+        self.inference_engine.load_model(threads=original_threads, context_size=original_context, quantization=original_quant)
         
         return res
         

@@ -23,8 +23,7 @@ SHORT_GENERATION_PROMPTS = [
     "List 5 benefits of using Arm64 processors in cloud computing."
 ]
 
-# Workload B: Context-Stress Workload
-# Standardized ~500-word technical passage (~650 tokens) with 5 analytical queries
+# Workload B: Context-Stress Workload (~650 tokens context)
 CONTEXT_STRESS_DOCUMENT = """
 Cloud computing architectures are undergoing a generational shift toward custom Arm-based silicon. 
 Traditional x86 architectures have dominated data centers for decades with complex out-of-order execution 
@@ -78,6 +77,7 @@ class BenchmarkEngine:
         self, 
         threads: int = None, 
         context_size: int = None,
+        quantization: str = None,
         workload_type: WorkloadType = WorkloadType.SHORT_GENERATION,
         save: bool = True
     ) -> Dict[str, Any]:
@@ -87,10 +87,11 @@ class BenchmarkEngine:
 
         prompts = SHORT_GENERATION_PROMPTS if workload_type == WorkloadType.SHORT_GENERATION else CONTEXT_STRESS_PROMPTS
         
-        used_threads = threads if threads is not None else config.MODEL_THREADS
-        used_context = context_size if context_size is not None else config.MODEL_CONTEXT_SIZE
+        used_threads = threads if threads is not None else getattr(self.engine, "active_threads", config.MODEL_THREADS)
+        used_context = context_size if context_size is not None else getattr(self.engine, "active_context_size", config.MODEL_CONTEXT_SIZE)
+        used_quant = quantization if quantization is not None else getattr(self.engine, "active_quantization", "Q4_K_M")
         
-        print(f"Starting benchmark run [{workload_type.value.upper()}] (Threads: {used_threads}, Context: {used_context})...")
+        print(f"Starting benchmark run [{workload_type.value.upper()}] (Quant: {used_quant}, Threads: {used_threads}, Context: {used_context})...")
         
         # 1. Warmup runs (2 runs)
         print("  Running warmups (2 runs)...")
@@ -141,10 +142,16 @@ class BenchmarkEngine:
             "architecture": platform_info["architecture"],
             "cpu": platform_info["cpu"],
             "cores": platform_info["physical_cores"],
-            "model": model_info["repository"],
-            "model_filename": model_info["filename"],
-            "model_size_mb": model_info["model_size_mb"],
-            "runtime": model_info["runtime"],
+            "model": model_info.get("repository", "Qwen/Qwen2.5-0.5B-Instruct-GGUF"),
+            "model_filename": model_info.get("filename", "model.gguf"),
+            "model_filepath": model_info.get("filepath"),
+            "model_size_mb": model_info.get("model_size_mb", 0.0),
+            "file_size_bytes": model_info.get("file_size_bytes"),
+            "sha256": model_info.get("sha256"),
+            "license": model_info.get("license", "Apache-2.0"),
+            "quality_score": model_info.get("quality_score"),
+            "load_time_ms": model_info.get("load_time_ms"),
+            "runtime": model_info.get("runtime", "llama.cpp"),
             "workload": {
                 "type": workload_type.value,
                 "prompt_suite_version": "v1.0",
@@ -155,10 +162,11 @@ class BenchmarkEngine:
                 "token_accounting": "completion_tokens_only"
             },
             "configuration": {
-                "quantization": model_info["quantization"],
+                "quantization": model_info.get("quantization", used_quant),
                 "threads": used_threads,
                 "context_size": used_context,
-                "batch_size": 1
+                "batch_size": 1,
+                "model_size_mb": model_info.get("model_size_mb", 0.0)
             },
             "benchmark_parameters": {
                 "warmups": 2,
@@ -178,6 +186,8 @@ class BenchmarkEngine:
                 "min_tokens_per_second": min_tps,
                 "max_tokens_per_second": max_tps,
                 "std_tokens_per_second": std_tps,
+                "model_size_mb": model_info["model_size_mb"],
+                "load_time_ms": model_info.get("load_time_ms"),
                 "memory_mb": None,
                 "memory_status": "unavailable",
                 "runs": all_results
@@ -191,18 +201,20 @@ class BenchmarkEngine:
     def save_results(self, report: Dict[str, Any]):
         timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         w_type = report["workload"]["type"]
+        q_type = report["configuration"]["quantization"]
         
         # JSON
-        json_path = os.path.join(self.results_dir, f"benchmark_{w_type}_{timestamp_str}.json")
+        json_path = os.path.join(self.results_dir, f"benchmark_{w_type}_{q_type}_{timestamp_str}.json")
         with open(json_path, 'w') as f:
             json.dump(report, f, indent=2)
             
         # CSV
-        csv_path = os.path.join(self.results_dir, f"benchmark_{w_type}_{timestamp_str}.csv")
+        csv_path = os.path.join(self.results_dir, f"benchmark_{w_type}_{q_type}_{timestamp_str}.csv")
         with open(csv_path, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([
                 "Timestamp", "Workload", "Provider", "Architecture", "CPU", "Cores", "Model", "Quantization", "Threads", "Context",
+                "Model_Size_MB", "Load_Time_ms", "SHA256",
                 "Mean_Latency_ms", "Median_Latency_ms", "P95_Latency_ms", "Min_Latency_ms", "Max_Latency_ms", "Std_Latency_ms",
                 "Mean_TPS", "Median_TPS", "P95_TPS", "Min_TPS", "Max_TPS", "Std_TPS",
                 "Memory_MB", "Memory_Status"
@@ -218,6 +230,9 @@ class BenchmarkEngine:
                 report["configuration"]["quantization"],
                 report["configuration"]["threads"],
                 report["configuration"]["context_size"],
+                report["model_size_mb"],
+                report.get("load_time_ms"),
+                report.get("sha256"),
                 report["results"]["mean_latency_ms"],
                 report["results"]["median_latency_ms"],
                 report["results"]["p95_latency_ms"],

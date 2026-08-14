@@ -55,7 +55,8 @@ async function loadDashboardData() {
             const rec = await recRes.json();
             if (rec.status === 'success') {
                 const cfg = rec.recommended_configuration;
-                document.getElementById('rec-config-hero').textContent = `Threads=${cfg.threads}, Context=${cfg.context_size}`;
+                const quant = cfg.quantization || 'Q4_K_M';
+                document.getElementById('rec-config-hero').textContent = `${quant} • Threads=${cfg.threads}, Context=${cfg.context_size}`;
                 document.getElementById('rec-reason').textContent = rec.reason;
                 document.getElementById('rec-lat').textContent = `${rec.metrics.mean_latency_ms.toFixed(2)} ms`;
                 document.getElementById('rec-tps').textContent = `${rec.metrics.mean_tokens_per_second.toFixed(2)} tok/s`;
@@ -95,8 +96,10 @@ function renderParetoCards(paretoList) {
     paretoList.forEach(p => {
         const item = document.createElement('div');
         item.className = 'pareto-item';
+        const q = p.quantization || 'Q4_K_M';
+        const sizeStr = p.model_size_mb ? ` (${p.model_size_mb.toFixed(1)}MB)` : '';
         item.innerHTML = `
-            <span class="p-config">T=${p.threads}, Ctx=${p.context_size}</span>
+            <span class="p-config">${q} T=${p.threads}, C=${p.context_size}${sizeStr}</span>
             <span class="p-stats">${p.mean_latency_ms.toFixed(1)}ms | ${p.mean_tokens_per_second.toFixed(1)} tok/s</span>
         `;
         container.appendChild(item);
@@ -115,14 +118,18 @@ function renderTable(results) {
 
         const cfg = r.configuration;
         const res = r.results;
+        const quant = cfg.quantization || 'Q4_K_M';
+        const sizeMb = (res.model_size_mb !== undefined ? `${res.model_size_mb.toFixed(1)} MB` : '--');
+        const loadMs = (res.load_time_ms !== undefined ? `${res.load_time_ms.toFixed(0)} ms` : '--');
 
         tr.innerHTML = `
-            <td><strong>T=${cfg.threads}, Ctx=${cfg.context_size}</strong></td>
+            <td><strong class="text-cyan">${quant}</strong></td>
+            <td><strong>T=${cfg.threads}, C=${cfg.context_size}</strong></td>
+            <td>${sizeMb}</td>
+            <td>${loadMs}</td>
             <td>${res.mean_latency_ms.toFixed(2)} ms</td>
             <td>${res.median_latency_ms.toFixed(2)} ms</td>
             <td>${res.p95_latency_ms.toFixed(2)} ms</td>
-            <td>${res.min_latency_ms.toFixed(1)} / ${res.max_latency_ms.toFixed(1)}</td>
-            <td>${res.std_latency_ms.toFixed(2)}</td>
             <td><strong>${res.mean_tokens_per_second.toFixed(2)}</strong> tok/s</td>
             <td>${r.pareto_optimal ? '<span class="tag-pareto">PARETO OPTIMAL</span>' : '<span class="tag-dominated">Dominated</span>'}</td>
             <td>${(r.score !== undefined ? r.score.toFixed(4) : '--')}</td>
@@ -195,6 +202,7 @@ function renderScatterPlot(results) {
         const lat = r.results.mean_latency_ms;
         const tps = r.results.mean_tokens_per_second;
         const isPareto = r.pareto_optimal;
+        const quant = r.configuration.quantization || 'Q4_K_M';
 
         const x = padLeft + ((lat - minLat) / (maxLat - minLat)) * (w - padLeft - padRight);
         const y = h - padBottom - ((tps - minTps) / (maxTps - minTps)) * (h - padTop - padBottom);
@@ -211,7 +219,7 @@ function renderScatterPlot(results) {
             // Label Pareto Point
             ctx.font = '10px JetBrains Mono';
             ctx.fillStyle = '#f0f4f8';
-            ctx.fillText(`T=${r.configuration.threads}, C=${r.configuration.context_size}`, x + 10, y - 6);
+            ctx.fillText(`${quant} T=${r.configuration.threads}, C=${r.configuration.context_size}`, x + 10, y - 6);
         } else {
             ctx.arc(x, y, 5, 0, 2 * Math.PI);
             ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';

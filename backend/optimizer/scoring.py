@@ -7,7 +7,7 @@ class ScoringEngine:
     def _normalize(val: float, min_val: float, max_val: float, invert: bool = False) -> float:
         """
         Normalizes a value between 0 and 1.
-        If invert is True, lower original values yield higher normalized scores (desirable for latency/memory).
+        If invert is True, lower original values yield higher normalized scores (desirable for latency/model size).
         If min_val == max_val, returns 1.0 (all configurations tied).
         """
         if max_val == min_val:
@@ -26,7 +26,7 @@ class ScoringEngine:
           score = (latency_score * 0.9) + (throughput_score * 0.1)
         - THROUGHPUT: 90% normalized throughput + 10% normalized inverse latency
           score = (throughput_score * 0.9) + (latency_score * 0.1)
-        - BALANCED: 50% normalized inverse latency + 50% normalized throughput (since memory is unavailable)
+        - BALANCED: 50% normalized inverse latency + 50% normalized throughput
           score = (latency_score + throughput_score) / 2.0
         - MEMORY: If memory measurement is unavailable, falls back to BALANCED with a documented note.
         """
@@ -68,12 +68,15 @@ class ScoringEngine:
     @staticmethod
     def get_pareto_frontier(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Calculates the Pareto frontier from tested configurations.
-        A configuration A dominates B if:
-          (A.latency <= B.latency AND A.throughput >= B.throughput)
-          AND (A.latency < B.latency OR A.throughput > B.throughput)
-          
-        Also annotates each item in `results` with `pareto_optimal: True/False`.
+        Calculates the Pareto frontier from tested configurations across measured objectives:
+        - Latency (lower is better)
+        - Throughput (higher is better)
+        - Model Size MB (lower is better)
+        
+        A configuration A dominates B if A is no worse than B on all 3 metrics
+        and strictly better on at least one.
+        
+        Annotates each item in `results` with `pareto_optimal: True/False`.
         Returns all non-dominated configurations.
         """
         pareto = []
@@ -81,16 +84,18 @@ class ScoringEngine:
             is_dominated = False
             lat1 = r1['results']['mean_latency_ms']
             tps1 = r1['results']['mean_tokens_per_second']
+            size1 = r1.get('model_size_mb', r1['results'].get('model_size_mb', 0.0))
             
             for j, r2 in enumerate(results):
                 if i == j:
                     continue
                 lat2 = r2['results']['mean_latency_ms']
                 tps2 = r2['results']['mean_tokens_per_second']
+                size2 = r2.get('model_size_mb', r2['results'].get('model_size_mb', 0.0))
                 
-                # Check if r2 strictly dominates r1
-                better_or_equal = (lat2 <= lat1) and (tps2 >= tps1)
-                strictly_better = (lat2 < lat1) or (tps2 > tps1)
+                # Check if r2 dominates r1 across (latency, throughput, model_size)
+                better_or_equal = (lat2 <= lat1) and (tps2 >= tps1) and (size2 <= size1)
+                strictly_better = (lat2 < lat1) or (tps2 > tps1) or (size2 < size1)
                 
                 if better_or_equal and strictly_better:
                     is_dominated = True

@@ -108,6 +108,11 @@ async def recommend_endpoint(req: RecommendRequest):
 async def get_model():
     return engine.get_model_info()
 
+@app.get("/api/models/variants")
+async def get_model_variants():
+    from backend.inference.models import AVAILABLE_VARIANTS, get_variant_identity
+    return {k: get_variant_identity(k) for k in AVAILABLE_VARIANTS.keys()}
+
 class GenerateRequest(BaseModel):
     prompt: str
     max_tokens: int = config.MAX_TOKENS

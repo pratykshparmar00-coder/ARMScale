@@ -11,27 +11,31 @@ class Objective(str, Enum):
 class OptimizationDimension(str, Enum):
     THREADS = "threads"
     CONTEXT = "context"
+    QUANTIZATION = "quantization"
     COMBINED = "combined"
 
 class OptimizationConfig(BaseModel):
     threads: int
     context_size: int
+    quantization: str = "Q4_K_M"
     batch_size: int = 1
     
     def dict(self, **kwargs):
         return {
             "threads": self.threads,
             "context_size": self.context_size,
+            "quantization": self.quantization,
             "batch_size": self.batch_size
         }
 
 class OptimizationRequest(BaseModel):
     objective: Objective = Objective.SPEED
     dimension: OptimizationDimension = OptimizationDimension.THREADS
-    workload_type: str = "short_generation" # "short_generation" or "context_stress"
+    workload_type: str = "short_generation"
     max_memory_mb: Optional[int] = None
     threads_to_test: Optional[List[int]] = None
     context_sizes_to_test: Optional[List[int]] = None
+    quantizations_to_test: Optional[List[str]] = None
 
 class OptimizationResult(BaseModel):
     experiment_id: str
