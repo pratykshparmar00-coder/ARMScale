@@ -1,12 +1,26 @@
 let currentExperimentResults = [];
 const API_BASE = window.API_BASE_URL || localStorage.getItem('API_BASE_URL') || '';
 
+// === Toast Notification System ===
+function showToast(icon, message, durationMs = 3500) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('toast-out');
+        toast.addEventListener('animationend', () => toast.remove());
+    }, durationMs);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initPlatform();
     loadDashboardData();
 
     document.getElementById('btn-recommend').addEventListener('click', () => {
-        loadDashboardData();
+        loadDashboardData({ showFeedback: true });
     });
 
     document.getElementById('workload-select').addEventListener('change', (e) => {
@@ -52,11 +66,19 @@ async function initPlatform() {
     }
 }
 
-async function loadDashboardData() {
+async function loadDashboardData(opts = {}) {
+    const { showFeedback = false } = opts;
     const workload = document.getElementById('workload-select').value;
     const objective = document.getElementById('objective-select').value;
+    const btn = document.getElementById('btn-recommend');
+    const recCard = document.querySelector('.recommendation-card');
 
     document.getElementById('rec-obj-badge').textContent = `${objective.toUpperCase()} OPTIMIZED`;
+
+    // Show loading state on button
+    if (showFeedback) {
+        btn.classList.add('loading');
+    }
 
     try {
         // 1. Fetch Recommendation
@@ -82,7 +104,22 @@ async function loadDashboardData() {
                 document.getElementById('rec-tps-imp').textContent = `${tpsImp >= 0 ? '+' : ''}${tpsImp.toFixed(2)}%`;
 
                 renderParetoCards(rec.pareto_configurations);
+
+                // Visual feedback on success
+                if (showFeedback) {
+                    // Flash the recommendation card
+                    if (recCard) {
+                        recCard.classList.remove('card-flash');
+                        void recCard.offsetWidth; // force reflow
+                        recCard.classList.add('card-flash');
+                    }
+                    showToast('✅', `<strong>${quant} T=${cfg.threads} C=${cfg.context_size}</strong> — ${rec.metrics.mean_latency_ms.toFixed(1)} ms, ${rec.metrics.mean_tokens_per_second.toFixed(1)} tok/s`);
+                }
+            } else if (rec.status === 'no_data' && showFeedback) {
+                showToast('⚠️', `No experiment data found for <strong>${workload}</strong>. Run an optimization sweep first.`);
             }
+        } else if (showFeedback) {
+            showToast('❌', `API error (${recRes.status}). Check backend connectivity.`);
         }
 
         // 2. Fetch Latest Experiment for Table & Scatter Plot
@@ -96,6 +133,12 @@ async function loadDashboardData() {
         }
     } catch (e) {
         console.error('Error fetching dashboard data:', e);
+        if (showFeedback) {
+            showToast('❌', `Network error: ${e.message}. Is the backend reachable?`);
+        }
+    } finally {
+        // Remove loading state
+        btn.classList.remove('loading');
     }
 }
 
