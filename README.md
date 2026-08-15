@@ -114,7 +114,7 @@ graph TD
     API --> OPT[Autonomous Optimization Engine]
     OPT --> GEN[36-Config Cartesian Generator]
     OPT --> BENCH[Benchmark Engine]
-    BENCH --> ENG[Inference Engine (llama.cpp)]
+    BENCH --> ENG["Inference Engine (llama.cpp)"]
     OPT --> SCORE[Scoring & 3D Pareto Engine]
     BENCH --> PLAT[Platform Adapter Layer]
 ```
